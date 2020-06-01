@@ -1,6 +1,6 @@
 import React from 'react';
 import './VodSyncApp.css';
-import { VideoInfo } from '../../types';
+import { VideoInfo, PlayerState } from '../../types';
 import { Timeline } from '../Timeline/Timeline';
 import { Viewer } from '../Viewer/Viewer';
 
@@ -10,6 +10,7 @@ interface VodSyncAppProps {}
 
 interface VodSyncAppState {
   accessToken: string | null;
+  playerState?: PlayerState;
   currentPosition?: Date;
   videos: Map<number, VideoInfo>;
 }
@@ -18,9 +19,15 @@ export class VodSyncApp extends React.PureComponent<
   VodSyncAppProps,
   VodSyncAppState
 > {
+  interval?: number;
+
   constructor(props: VodSyncAppProps) {
     super(props);
     this.state = this.initialState();
+    this.interval = window.setInterval(
+      this.computeCurrentPosition.bind(this),
+      1000
+    );
   }
 
   initialState() {
@@ -36,6 +43,13 @@ export class VodSyncApp extends React.PureComponent<
     };
   }
 
+  componentWillUnmount() {
+    if (this.interval !== undefined) {
+      window.clearInterval(this.interval);
+      this.interval = undefined;
+    }
+  }
+
   setVideoInfo(id: number, info: VideoInfo) {
     console.log('setVideoInfo: ', id, ', ', info);
     this.setState(state => {
@@ -45,8 +59,25 @@ export class VodSyncApp extends React.PureComponent<
     });
   }
 
-  handleSeek(id: number, position: Date) {
-    this.setState({ currentPosition: position });
+  handlePlayerStateChange(id: number, playerState: PlayerState) {
+    this.setState({ playerState });
+    this.computeCurrentPosition();
+  }
+
+  computeCurrentPosition() {
+    this.setState(state => {
+      let currentPosition;
+      if (state.playerState?.state === 'paused') {
+        currentPosition = state.playerState.position;
+      } else if (state.playerState?.state === 'playing') {
+        currentPosition = new Date(
+          new Date().getTime() + state.playerState.offset * 1000.0
+        );
+      } else {
+        return {};
+      }
+      return { currentPosition };
+    });
   }
 
   render() {
@@ -67,7 +98,9 @@ export class VodSyncApp extends React.PureComponent<
           clientId={TWITCH_CLIENT_ID}
           accessToken={this.state.accessToken}
           setVideoInfo={(info: VideoInfo) => this.setVideoInfo(1, info)}
-          onPositionChange={(position: Date) => this.handleSeek(1, position)}
+          onChange={(playerState: PlayerState) =>
+            this.handlePlayerStateChange(1, playerState)
+          }
         />
         <Timeline
           currentPosition={this.state.currentPosition}

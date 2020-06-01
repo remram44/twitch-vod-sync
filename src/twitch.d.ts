@@ -9,8 +9,8 @@ declare namespace Twitch {
     });
 
     addEventListener(event: TwitchEvent, callback: () => void): void;
-
     getCurrentTime(): number;
+    isPaused(): boolean;
 
     static const READY: TwitchEvent;
     static const PLAYING: TwitchEvent;
