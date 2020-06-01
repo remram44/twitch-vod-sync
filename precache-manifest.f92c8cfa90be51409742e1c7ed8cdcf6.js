@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "c2267e0f5aaae7cbc1b584c39859dee1",
+    "revision": "5c95f2614b8c4e64eb611adb04bae56c",
     "url": "/twitch-vod-sync/index.html"
   },
   {
-    "revision": "d459f93f184c84d7d6ba",
+    "revision": "c5410d84165da8d79f41",
     "url": "/twitch-vod-sync/static/css/main.626f2b0e.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/twitch-vod-sync/static/js/2.f5cd43f8.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "d459f93f184c84d7d6ba",
-    "url": "/twitch-vod-sync/static/js/main.1a643b84.chunk.js"
+    "revision": "c5410d84165da8d79f41",
+    "url": "/twitch-vod-sync/static/js/main.eea20466.chunk.js"
   },
   {
     "revision": "be98d236ecb28594698b",
