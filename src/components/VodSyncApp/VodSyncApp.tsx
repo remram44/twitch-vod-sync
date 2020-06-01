@@ -33,7 +33,7 @@ export class VodSyncApp extends React.PureComponent<VodSyncAppProps, VodSyncAppS
     if(!this.state.accessToken) {
       setTimeout(
         () => {
-          window.location.href = "https://id.twitch.tv/oauth2/authorize?client_id=" + TWITCH_CLIENT_ID + "&redirect_uri=https://twitch-sync.remram.fr/&response_type=token&scope=";
+          window.location.href = "https://id.twitch.tv/oauth2/authorize?client_id=" + TWITCH_CLIENT_ID + "&redirect_uri=https://remram44.github.io/twitch-vod-sync/&response_type=token&scope=";
         },
         2000,
       );
