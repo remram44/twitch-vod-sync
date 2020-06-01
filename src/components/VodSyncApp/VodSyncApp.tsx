@@ -10,7 +10,7 @@ interface VodSyncAppProps {}
 
 interface VodSyncAppState {
   accessToken: string | null;
-  playerState?: PlayerState;
+  playerState: PlayerState;
   currentPosition?: Date;
   videos: Map<number, VideoInfo>;
   width: number;
@@ -28,11 +28,12 @@ export class VodSyncApp extends React.PureComponent<
     this.state = this.initialState();
     this.setVideoInfo = this.setVideoInfo.bind(this);
     this.handlePlayerStateChange = this.handlePlayerStateChange.bind(this);
+    this.handleSeek = this.handleSeek.bind(this);
     this.resized = this.resized.bind(this);
     window.addEventListener('resize', this.resized);
   }
 
-  initialState() {
+  initialState(): VodSyncAppState {
     const match = window.location.hash.match(/#access_token=([^&]+)/);
     let accessToken = null;
     if (match && match[1]) {
@@ -41,6 +42,10 @@ export class VodSyncApp extends React.PureComponent<
     }
     return {
       accessToken,
+      playerState: {
+        state: 'paused',
+        position: new Date(1),
+      },
       videos: new Map(),
       width: window.innerWidth / 2 - 6,
       height: window.innerHeight - 20 - 6,
@@ -76,11 +81,52 @@ export class VodSyncApp extends React.PureComponent<
       videos.set(id, info);
       return { videos };
     });
+
+    // Update the player state to fall within at least one video
+    const videosArray = Array.from(this.state.videos.values());
+    const start = Math.min(...videosArray.map(v => v.startDate.getTime()));
+    const end = Math.max(
+      ...videosArray.map(v => v.startDate.getTime() + v.duration * 1000)
+    );
+    if (this.state.playerState.state === 'paused') {
+      if (this.state.playerState.position.getTime() < start) {
+        this.setState({
+          playerState: {
+            state: 'paused',
+            position: new Date(start),
+          },
+        });
+      } else if (this.state.playerState.position.getTime() > end) {
+        this.setState({
+          playerState: {
+            state: 'paused',
+            position: new Date(end),
+          },
+        });
+      }
+    } else if (this.state.playerState.state === 'playing') {
+      const minOffset = (start - new Date().getTime()) / 1000.0;
+      const maxOffset = (end - new Date().getTime()) / 1000.0;
+      if (this.state.playerState.offset < minOffset) {
+        this.setState({
+          playerState: {
+            state: 'playing',
+            offset: minOffset,
+          },
+        });
+      } else if (this.state.playerState.offset > maxOffset) {
+        this.setState({
+          playerState: {
+            state: 'playing',
+            offset: maxOffset,
+          },
+        });
+      }
+    }
   }
 
   handlePlayerStateChange(id: number, playerState: PlayerState) {
-    this.setState({ playerState });
-    this.computeCurrentPosition();
+    // TODO: Handle unexpected state change in players
   }
 
   computeCurrentPosition() {
@@ -96,6 +142,16 @@ export class VodSyncApp extends React.PureComponent<
         return {};
       }
       return { currentPosition };
+    });
+  }
+
+  handleSeek(position: Date) {
+    const offset = (position.getTime() - new Date().getTime()) / 1000.0;
+    this.setState({
+      playerState: {
+        state: 'playing',
+        offset,
+      },
     });
   }
 
@@ -117,6 +173,7 @@ export class VodSyncApp extends React.PureComponent<
             id={1}
             clientId={TWITCH_CLIENT_ID}
             accessToken={this.state.accessToken}
+            state={this.state.playerState}
             setVideoInfo={this.setVideoInfo}
             onChange={this.handlePlayerStateChange}
             width={this.state.width}
@@ -126,6 +183,7 @@ export class VodSyncApp extends React.PureComponent<
             id={2}
             clientId={TWITCH_CLIENT_ID}
             accessToken={this.state.accessToken}
+            state={this.state.playerState}
             setVideoInfo={this.setVideoInfo}
             onChange={this.handlePlayerStateChange}
             width={this.state.width}
@@ -135,7 +193,7 @@ export class VodSyncApp extends React.PureComponent<
         <Timeline
           currentPosition={this.state.currentPosition}
           videos={this.state.videos}
-          onSeek={d => console.log(d)}
+          onSeek={this.handleSeek}
         />
       </>
     );

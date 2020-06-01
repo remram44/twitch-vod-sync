@@ -7,6 +7,7 @@ interface ViewerProps {
   id: number;
   clientId: string;
   accessToken: string;
+  state?: PlayerState;
   setVideoInfo: (id: number, info: VideoInfo) => void;
   onChange: (id: number, playerState: PlayerState) => void;
   width: number;
@@ -20,24 +21,44 @@ interface ViewerState {
   currentPosition?: Date;
 }
 
-const MAX_DELTA = 0.8;
-
 export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   player?: Twitch.Player;
-  playerState?: PlayerState;
   interval?: number;
 
   constructor(props: ViewerProps) {
     super(props);
     this.state = this.initialState();
     this.player = undefined;
-    this.playerState = undefined;
     this.handleVideoPicked = this.handleVideoPicked.bind(this);
-    this.updateTimestamp = this.updateTimestamp.bind(this);
   }
 
   initialState() {
     return {};
+  }
+
+  componentDidUpdate(prevProps: ViewerProps) {
+    if (
+      this.props.state &&
+      this.props.state !== prevProps.state &&
+      this.player &&
+      this.state.videoDate
+    ) {
+      if (this.props.state.state === 'paused') {
+        this.player.pause();
+        this.player.seek(
+          (this.props.state.position.getTime() -
+            this.state.videoDate.getTime()) /
+            1000.0
+        );
+      } else if (this.props.state.state === 'playing') {
+        const seek =
+          new Date().getTime() / 1000.0 +
+          this.props.state.offset -
+          this.state.videoDate.getTime() / 1000.0;
+        this.player.seek(seek);
+        this.player.play();
+      }
+    }
   }
 
   async handleVideoPicked(video: number) {
@@ -74,67 +95,9 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
       width: '100%',
       height: '100%',
       video,
+      autoplay: false,
     });
-    this.player.addEventListener(Twitch.Player.READY, this.updateTimestamp);
-    this.player.addEventListener(Twitch.Player.PLAYING, this.updateTimestamp);
-    this.player.addEventListener(Twitch.Player.PAUSE, this.updateTimestamp);
     console.log('Created player', this.player);
-    this.interval = window.setInterval(this.updateTimestamp, 1000);
-  }
-
-  componentWillUnmount() {
-    if (this.interval !== undefined) {
-      window.clearInterval(this.interval);
-      this.interval = undefined;
-    }
-  }
-
-  updateTimestamp() {
-    if (!this.state.videoDate || !this.player) {
-      return;
-    }
-    const timestamp = new Date(
-      this.state.videoDate.getTime() + this.player.getCurrentTime() * 1000
-    );
-    if (this.player.isPaused()) {
-      this.playerStateChanged({
-        state: 'paused',
-        position: timestamp,
-      });
-    } else {
-      this.playerStateChanged({
-        state: 'playing',
-        offset: (timestamp.getTime() - new Date().getTime()) / 1000.0,
-      });
-    }
-  }
-
-  playerStateChanged(newPlayerState: PlayerState): boolean {
-    if (this.playerState !== undefined) {
-      if (
-        newPlayerState.state === 'paused' &&
-        this.playerState.state === 'paused'
-      ) {
-        const delta =
-          this.playerState.position.getTime() -
-          newPlayerState.position.getTime();
-        if (Math.abs(delta) <= MAX_DELTA) {
-          return false;
-        }
-      } else if (
-        newPlayerState.state === 'playing' &&
-        this.playerState.state === 'playing'
-      ) {
-        const delta = this.playerState.offset - newPlayerState.offset;
-        if (Math.abs(delta) <= MAX_DELTA) {
-          return false;
-        }
-      }
-    }
-    console.log('update state');
-    this.playerState = newPlayerState;
-    this.props.onChange(this.props.id, newPlayerState);
-    return true;
   }
 
   render() {
