@@ -1,12 +1,17 @@
 import React from 'react';
+import { VideoInfo, PlayerState } from '../../types';
 import { parseDuration } from '../../utils';
 import { VideoPicker } from '../VideoPicker/VideoPicker';
-import { Timeline } from '../Timeline/Timeline';
 
 interface ViewerProps {
   id: number;
   clientId: string;
   accessToken: string;
+  state?: PlayerState;
+  setVideoInfo: (id: number, info: VideoInfo) => void;
+  onChange: (id: number, playerState: PlayerState) => void;
+  width: number;
+  height: number;
 }
 
 interface ViewerState {
@@ -17,20 +22,43 @@ interface ViewerState {
 }
 
 export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
-  interval?: number;
   player?: Twitch.Player;
+  interval?: number;
 
   constructor(props: ViewerProps) {
     super(props);
     this.state = this.initialState();
-    this.interval = undefined;
     this.player = undefined;
     this.handleVideoPicked = this.handleVideoPicked.bind(this);
-    this.updateTimestamp = this.updateTimestamp.bind(this);
   }
 
   initialState() {
     return {};
+  }
+
+  componentDidUpdate(prevProps: ViewerProps) {
+    if (
+      this.props.state &&
+      this.props.state !== prevProps.state &&
+      this.player &&
+      this.state.videoDate
+    ) {
+      if (this.props.state.state === 'paused') {
+        this.player.pause();
+        this.player.seek(
+          (this.props.state.position.getTime() -
+            this.state.videoDate.getTime()) /
+            1000.0
+        );
+      } else if (this.props.state.state === 'playing') {
+        const seek =
+          new Date().getTime() / 1000.0 +
+          this.props.state.offset -
+          this.state.videoDate.getTime() / 1000.0;
+        this.player.seek(seek);
+        this.player.play();
+      }
+    }
   }
 
   async handleVideoPicked(video: number) {
@@ -50,9 +78,15 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
       const json = await response.json();
       const videoInfo = json.data[0];
       console.log('Got video date: ', videoInfo.created_at);
+      const videoDate = new Date(videoInfo.created_at);
+      const videoDuration = parseDuration(videoInfo.duration);
       this.setState({
-        videoDate: new Date(videoInfo.created_at),
-        videoDuration: parseDuration(videoInfo.duration),
+        videoDate,
+        videoDuration,
+      });
+      this.props.setVideoInfo(this.props.id, {
+        startDate: videoDate,
+        duration: videoDuration,
       });
     }
 
@@ -61,55 +95,34 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
       width: '100%',
       height: '100%',
       video,
+      autoplay: false,
     });
-    this.player.addEventListener(Twitch.Player.READY, this.updateTimestamp);
-    this.player.addEventListener(Twitch.Player.PLAYING, this.updateTimestamp);
-    this.player.addEventListener(Twitch.Player.PAUSE, this.updateTimestamp);
-    this.interval = window.setInterval(this.updateTimestamp, 1000);
-  }
-
-  componentWillUnmount() {
-    window.clearInterval(this.interval);
-    this.interval = undefined;
-  }
-
-  updateTimestamp() {
-    if (!this.state.videoDate || !this.player) {
-      return;
-    }
-    let timestamp = this.state.videoDate.getTime();
-    timestamp += this.player.getCurrentTime() * 1000;
-    this.setState({ currentPosition: new Date(timestamp) });
+    console.log('Created player', this.player);
   }
 
   render() {
     if (this.state.video) {
-      let timeline;
-      if (this.state.videoDate && this.state.videoDuration) {
-        const videoInfo = new Map([
-          [
-            1,
-            {
-              startDate: this.state.videoDate,
-              duration: this.state.videoDuration,
-            },
-          ],
-        ]);
-        timeline = (
-          <Timeline
-            currentPosition={this.state.currentPosition}
-            videos={videoInfo}
-          />
-        );
-      }
       return (
-        <>
-          <div id={'player' + this.props.id} className="player"></div>
-          {timeline}
-        </>
+        <div
+          id={'player' + this.props.id}
+          className="player"
+          style={{
+            width: this.props.width + 'px',
+            height: this.props.height + 'px',
+          }}
+        ></div>
       );
     } else {
-      return <VideoPicker onVideoPicked={this.handleVideoPicked} />;
+      return (
+        <div
+          style={{
+            width: this.props.width + 'px',
+            height: this.props.height + 'px',
+          }}
+        >
+          <VideoPicker onVideoPicked={this.handleVideoPicked} />
+        </div>
+      );
     }
   }
 }

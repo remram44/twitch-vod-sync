@@ -1,4 +1,4 @@
-.player {
+.container {
   position: fixed;
   top: 0;
   left: 0;
@@ -6,11 +6,15 @@
   bottom: 20px;
 }
 
-.timestamps {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+.container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.container div {
+  width: 200px;
+  height: 200px;
+  border: 1px solid black;
+  margin: 2px;
 }
