@@ -1,12 +1,14 @@
 import React from 'react';
+import { VideoInfo } from '../../types';
 import { parseDuration } from '../../utils';
 import { VideoPicker } from '../VideoPicker/VideoPicker';
-import { Timeline } from '../Timeline/Timeline';
 
 interface ViewerProps {
   id: number;
   clientId: string;
   accessToken: string;
+  setVideoInfo: (info: VideoInfo) => void;
+  onPositionChange: (position: Date) => void;
 }
 
 interface ViewerState {
@@ -17,13 +19,13 @@ interface ViewerState {
 }
 
 export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
-  interval?: number;
   player?: Twitch.Player;
+  offset?: number;
+  interval?: number;
 
   constructor(props: ViewerProps) {
     super(props);
     this.state = this.initialState();
-    this.interval = undefined;
     this.player = undefined;
     this.handleVideoPicked = this.handleVideoPicked.bind(this);
     this.updateTimestamp = this.updateTimestamp.bind(this);
@@ -50,9 +52,15 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
       const json = await response.json();
       const videoInfo = json.data[0];
       console.log('Got video date: ', videoInfo.created_at);
+      const videoDate = new Date(videoInfo.created_at);
+      const videoDuration = parseDuration(videoInfo.duration);
       this.setState({
-        videoDate: new Date(videoInfo.created_at),
-        videoDuration: parseDuration(videoInfo.duration),
+        videoDate,
+        videoDuration,
+      });
+      this.props.setVideoInfo({
+        startDate: videoDate,
+        duration: videoDuration,
       });
     }
 
@@ -65,49 +73,31 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     this.player.addEventListener(Twitch.Player.READY, this.updateTimestamp);
     this.player.addEventListener(Twitch.Player.PLAYING, this.updateTimestamp);
     this.player.addEventListener(Twitch.Player.PAUSE, this.updateTimestamp);
+    console.log('Created player', this.player);
     this.interval = window.setInterval(this.updateTimestamp, 1000);
   }
 
   componentWillUnmount() {
-    window.clearInterval(this.interval);
-    this.interval = undefined;
+    if (this.interval !== undefined) {
+      window.clearInterval(this.interval);
+      this.interval = undefined;
+    }
   }
 
   updateTimestamp() {
     if (!this.state.videoDate || !this.player) {
       return;
     }
-    let timestamp = this.state.videoDate.getTime();
-    timestamp += this.player.getCurrentTime() * 1000;
-    this.setState({ currentPosition: new Date(timestamp) });
+    const timestamp = new Date(
+      this.state.videoDate.getTime() + this.player.getCurrentTime() * 1000
+    );
+    this.setState({ currentPosition: timestamp });
+    this.props.onPositionChange(timestamp);
   }
 
   render() {
     if (this.state.video) {
-      let timeline;
-      if (this.state.videoDate && this.state.videoDuration) {
-        const videoInfo = new Map([
-          [
-            1,
-            {
-              startDate: this.state.videoDate,
-              duration: this.state.videoDuration,
-            },
-          ],
-        ]);
-        timeline = (
-          <Timeline
-            currentPosition={this.state.currentPosition}
-            videos={videoInfo}
-          />
-        );
-      }
-      return (
-        <>
-          <div id={'player' + this.props.id} className="player"></div>
-          {timeline}
-        </>
-      );
+      return <div id={'player' + this.props.id} className="player"></div>;
     } else {
       return <VideoPicker onVideoPicked={this.handleVideoPicked} />;
     }

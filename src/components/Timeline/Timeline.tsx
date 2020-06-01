@@ -1,10 +1,6 @@
 import React from 'react';
 import { formatDate } from '../../utils';
-
-interface VideoInfo {
-  startDate: Date;
-  duration: number;
-}
+import { VideoInfo } from '../../types';
 
 interface TimelineProps {
   videos: Map<number, VideoInfo>;
@@ -12,6 +8,9 @@ interface TimelineProps {
 }
 
 export function Timeline(props: TimelineProps) {
+  if (props.videos.size === 0) {
+    return <div className="timestamps"></div>;
+  }
   const videos = Array.from(props.videos.values());
   const startDate = new Date(
     Math.min(...videos.map(v => v.startDate.getTime()))

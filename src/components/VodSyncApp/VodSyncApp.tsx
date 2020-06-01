@@ -1,6 +1,7 @@
 import React from 'react';
 import './VodSyncApp.css';
-
+import { VideoInfo } from '../../types';
+import { Timeline } from '../Timeline/Timeline';
 import { Viewer } from '../Viewer/Viewer';
 
 const TWITCH_CLIENT_ID = 'r69vc9claq1m3n960hrkuszot4nx54';
@@ -9,6 +10,8 @@ interface VodSyncAppProps {}
 
 interface VodSyncAppState {
   accessToken: string | null;
+  currentPosition?: Date;
+  videos: Map<number, VideoInfo>;
 }
 
 export class VodSyncApp extends React.PureComponent<
@@ -29,7 +32,21 @@ export class VodSyncApp extends React.PureComponent<
     }
     return {
       accessToken,
+      videos: new Map(),
     };
+  }
+
+  setVideoInfo(id: number, info: VideoInfo) {
+    console.log('setVideoInfo: ', id, ', ', info);
+    this.setState(state => {
+      const videos = new Map(state.videos);
+      videos.set(id, info);
+      return { videos };
+    });
+  }
+
+  handleSeek(id: number, position: Date) {
+    this.setState({ currentPosition: position });
   }
 
   render() {
@@ -44,11 +61,19 @@ export class VodSyncApp extends React.PureComponent<
     }
 
     return (
-      <Viewer
-        id={1}
-        clientId={TWITCH_CLIENT_ID}
-        accessToken={this.state.accessToken}
-      />
+      <>
+        <Viewer
+          id={1}
+          clientId={TWITCH_CLIENT_ID}
+          accessToken={this.state.accessToken}
+          setVideoInfo={(info: VideoInfo) => this.setVideoInfo(1, info)}
+          onPositionChange={(position: Date) => this.handleSeek(1, position)}
+        />
+        <Timeline
+          currentPosition={this.state.currentPosition}
+          videos={this.state.videos}
+        />
+      </>
     );
   }
 }
