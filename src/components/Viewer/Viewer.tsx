@@ -37,19 +37,19 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     this.setState({ video });
 
     // Get video information from API
-    let response = await fetch(
-      "https://api.twitch.tv/helix/videos?id=" + video,
+    const response = await fetch(
+      'https://api.twitch.tv/helix/videos?id=' + video,
       {
         headers: {
-          "Client-ID": this.props.clientId,
-          "Authorization": "Bearer " + this.props.accessToken,
+          'Client-ID': this.props.clientId,
+          Authorization: 'Bearer ' + this.props.accessToken,
         },
-      },
+      }
     );
-    if(response.status === 200) {
-      let json = await response.json();
-      var videoInfo = json.data[0];
-      console.log("Got video date: ", videoInfo.created_at);
+    if (response.status === 200) {
+      const json = await response.json();
+      const videoInfo = json.data[0];
+      console.log('Got video date: ', videoInfo.created_at);
       this.setState({
         videoDate: new Date(videoInfo.created_at),
         videoDuration: parseDuration(videoInfo.duration),
@@ -57,10 +57,10 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     }
 
     // Create player
-    this.player = new Twitch.Player("player" + this.props.id, {
-      width: "100%",
-      height: "100%",
-      video: video,
+    this.player = new Twitch.Player('player' + this.props.id, {
+      width: '100%',
+      height: '100%',
+      video,
     });
     this.player.addEventListener(Twitch.Player.READY, this.updateTimestamp);
     this.player.addEventListener(Twitch.Player.PLAYING, this.updateTimestamp);
@@ -74,7 +74,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   }
 
   updateTimestamp() {
-    if(!this.state.videoDate || !this.player) {
+    if (!this.state.videoDate || !this.player) {
       return;
     }
     let timestamp = this.state.videoDate.getTime();
@@ -83,14 +83,17 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   }
 
   render() {
-    if(this.state.video) {
+    if (this.state.video) {
       let timeline;
-      if(this.state.videoDate && this.state.videoDuration) {
+      if (this.state.videoDate && this.state.videoDuration) {
         const videoInfo = new Map([
-          [1, {
-            startDate: this.state.videoDate,
-            duration: this.state.videoDuration,
-          }],
+          [
+            1,
+            {
+              startDate: this.state.videoDate,
+              duration: this.state.videoDuration,
+            },
+          ],
         ]);
         timeline = (
           <Timeline
@@ -99,10 +102,12 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
           />
         );
       }
-      return <>
-        <div id={"player" + this.props.id} className="player"></div>
-        {timeline}
-      </>;
+      return (
+        <>
+          <div id={'player' + this.props.id} className="player"></div>
+          {timeline}
+        </>
+      );
     } else {
       return <VideoPicker onVideoPicked={this.handleVideoPicked} />;
     }

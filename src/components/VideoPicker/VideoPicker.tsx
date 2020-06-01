@@ -15,25 +15,32 @@ export class VideoPicker extends React.PureComponent<VideoPickerProps> {
 
   handleSubmit(evt: React.FormEvent<HTMLFormElement>) {
     evt.preventDefault();
-    if(this.inputRef.current) {
-      let value = this.inputRef.current.value;
-      let m = value.match(/^(?:https?:\/\/(?:www\.|m\.)?twitch\.tv\/videos\/)?([0-9]+)$/);
-      if(m) {
-        let video = parseInt(m[1]);
-        console.log("Picked video: ", value, " ", video);
+    if (this.inputRef.current) {
+      const value = this.inputRef.current.value;
+      const m = value.match(
+        /^(?:https?:\/\/(?:www\.|m\.)?twitch\.tv\/videos\/)?([0-9]+)$/
+      );
+      if (m) {
+        const video = Number(m[1]);
+        console.log('Picked video: ', value, ' ', video);
         this.props.onVideoPicked(video);
       } else {
-        console.log("Wrong URL: ", value);
+        console.log('Wrong URL: ', value);
       }
     } else {
-      console.error("No inputRef");
+      console.error('No inputRef');
     }
   }
 
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
-        <input type="text" name="video" ref={this.inputRef} placeholder="Twitch video URL" />
+        <input
+          type="text"
+          name="video"
+          ref={this.inputRef}
+          placeholder="Twitch video URL"
+        />
         <input type="submit" value="Watch" />
       </form>
     );

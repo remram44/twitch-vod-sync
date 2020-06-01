@@ -11,18 +11,21 @@ interface VodSyncAppState {
   accessToken: string | null;
 }
 
-export class VodSyncApp extends React.PureComponent<VodSyncAppProps, VodSyncAppState> {
+export class VodSyncApp extends React.PureComponent<
+  VodSyncAppProps,
+  VodSyncAppState
+> {
   constructor(props: VodSyncAppProps) {
     super(props);
     this.state = this.initialState();
   }
 
   initialState() {
-    let match = window.location.hash.match(/#access_token=([^&]+)/);
+    const match = window.location.hash.match(/#access_token=([^&]+)/);
     let accessToken = null;
-    if(match && match[1]) {
+    if (match && match[1]) {
       accessToken = match[1];
-      console.log("Got access token: ", accessToken);
+      console.log('Got access token: ', accessToken);
     }
     return {
       accessToken,
@@ -30,18 +33,22 @@ export class VodSyncApp extends React.PureComponent<VodSyncAppProps, VodSyncAppS
   }
 
   render() {
-    if(!this.state.accessToken) {
-      setTimeout(
-        () => {
-          window.location.href = "https://id.twitch.tv/oauth2/authorize?client_id=" + TWITCH_CLIENT_ID + "&redirect_uri=https://remram44.github.io/twitch-vod-sync/&response_type=token&scope=";
-        },
-        2000,
-      );
+    if (!this.state.accessToken) {
+      setTimeout(() => {
+        window.location.href =
+          'https://id.twitch.tv/oauth2/authorize?client_id=' +
+          TWITCH_CLIENT_ID +
+          '&redirect_uri=https://remram44.github.io/twitch-vod-sync/&response_type=token&scope=';
+      }, 2000);
       return <p>Redirecting you to Twitch to authorize use of their API...</p>;
     }
 
     return (
-      <Viewer id={1} clientId={TWITCH_CLIENT_ID} accessToken={this.state.accessToken} />
+      <Viewer
+        id={1}
+        clientId={TWITCH_CLIENT_ID}
+        accessToken={this.state.accessToken}
+      />
     );
   }
 }
