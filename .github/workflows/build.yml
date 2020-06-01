@@ -1,0 +1,30 @@
+name: Build
+
+on:
+- push
+- pull_request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - uses: actions/cache@v2
+      id: node-modules
+      with:
+        path: node_modules
+        key: node-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          node-
+    - run: npm install
+    - run: PUBLIC_URL=/twitch-vod-sync/ npm run build
+    #- run: npm run check
+    - run: echo ${{ github.ref }}
+    - uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build
+      if: ${{ github.ref == 'refs/heads/master' }}
