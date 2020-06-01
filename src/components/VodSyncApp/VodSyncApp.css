@@ -6,15 +6,6 @@
   bottom: 20px;
 }
 
-.timestamps {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-}
-
 .container {
   display: flex;
   flex-direction: row;

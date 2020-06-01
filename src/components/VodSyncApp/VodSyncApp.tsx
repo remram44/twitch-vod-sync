@@ -135,6 +135,7 @@ export class VodSyncApp extends React.PureComponent<
         <Timeline
           currentPosition={this.state.currentPosition}
           videos={this.state.videos}
+          onSeek={d => console.log(d)}
         />
       </>
     );
