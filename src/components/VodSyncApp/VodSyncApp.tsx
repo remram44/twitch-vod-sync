@@ -26,10 +26,6 @@ export class VodSyncApp extends React.PureComponent<
   constructor(props: VodSyncAppProps) {
     super(props);
     this.state = this.initialState();
-    this.interval = window.setInterval(
-      this.computeCurrentPosition.bind(this),
-      1000
-    );
     this.setVideoInfo = this.setVideoInfo.bind(this);
     this.handlePlayerStateChange = this.handlePlayerStateChange.bind(this);
     this.resized = this.resized.bind(this);
@@ -49,6 +45,13 @@ export class VodSyncApp extends React.PureComponent<
       width: window.innerWidth / 2 - 6,
       height: window.innerHeight - 20 - 6,
     };
+  }
+
+  componentDidMount() {
+    this.interval = window.setInterval(
+      this.computeCurrentPosition.bind(this),
+      1000
+    );
   }
 
   componentWillUnmount() {
