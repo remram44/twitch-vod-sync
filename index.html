@@ -4,14 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Twich VOD Sync</title>
+    <style type="text/css">
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+div.player {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 20px;
+}
+
+div.timestamps {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+}
+    </style>
   </head>
   <body>
     <form id="picker">
       <input type="text" id="picker-video" placeholder="Twitch video ID">
       <input type="submit" value="Watch">
     </form>
-    <div id="player" style="display: none; position: fixed; top: 0; left: 0; bottom: 20px; right: 0;"></div>
-    <div style="position: absolute; bottom: 0; left: 0; right: 0; text-align: center; display: flex; justify-content: space-between;">
+    <div id="player1" class="player"></div>
+    <div class="timestamps">
       <div id="timestamp-start"></div>
       <div id="timestamp"></div>
       <div id="timestamp-end"></div>
@@ -68,7 +93,7 @@ var interval = null;
 
 function showVideo(video) {
   console.log("video: ", video);
-  document.getElementById("player").style.display = "block";
+  document.getElementById("player1").style.display = "block";
 
   // Get video information from API
   var videoDate = null;
@@ -98,7 +123,7 @@ function showVideo(video) {
   });
 
   // Create player
-  var player = new Twitch.Player("player", {
+  var player = new Twitch.Player("player1", {
     width: "100%",
     height: "100%",
     video: video,
