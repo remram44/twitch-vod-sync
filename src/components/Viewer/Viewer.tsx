@@ -1,6 +1,7 @@
 import React from 'react';
-import { formatDate, parseDuration } from '../../utils';
+import { parseDuration } from '../../utils';
 import { VideoPicker } from '../VideoPicker/VideoPicker';
+import { Timeline } from '../Timeline/Timeline';
 
 interface ViewerProps {
   id: number;
@@ -83,28 +84,24 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
 
   render() {
     if(this.state.video) {
-      let startDate = '';
-      let endDate = '';
+      let timeline;
       if(this.state.videoDate && this.state.videoDuration) {
-        startDate = formatDate(this.state.videoDate);
-        endDate = formatDate(
-          new Date(
-            this.state.videoDate.getTime()
-            + this.state.videoDuration * 1000
-          )
+        const videoInfo = new Map([
+          [1, {
+            startDate: this.state.videoDate,
+            duration: this.state.videoDuration,
+          }],
+        ]);
+        timeline = (
+          <Timeline
+            currentPosition={this.state.currentPosition}
+            videos={videoInfo}
+          />
         );
-      }
-      let currentDate = '';
-      if(this.state.currentPosition) {
-        currentDate = formatDate(this.state.currentPosition);
       }
       return <>
         <div id={"player" + this.props.id} className="player"></div>
-        <div className="timestamps">
-          <div>{startDate}</div>
-          <div>{currentDate}</div>
-          <div>{endDate}</div>
-        </div>
+        {timeline}
       </>;
     } else {
       return <VideoPicker onVideoPicked={this.handleVideoPicked} />;
