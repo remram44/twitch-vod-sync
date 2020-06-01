@@ -1,4 +1,4 @@
-.player {
+.container {
   position: fixed;
   top: 0;
   left: 0;
@@ -13,4 +13,17 @@
   right: 0;
   display: flex;
   justify-content: space-between;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.container div {
+  width: 200px;
+  height: 200px;
+  border: 1px solid black;
+  margin: 2px;
 }

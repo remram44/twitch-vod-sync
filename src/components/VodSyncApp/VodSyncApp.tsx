@@ -13,6 +13,8 @@ interface VodSyncAppState {
   playerState?: PlayerState;
   currentPosition?: Date;
   videos: Map<number, VideoInfo>;
+  width: number;
+  height: number;
 }
 
 export class VodSyncApp extends React.PureComponent<
@@ -28,6 +30,10 @@ export class VodSyncApp extends React.PureComponent<
       this.computeCurrentPosition.bind(this),
       1000
     );
+    this.setVideoInfo = this.setVideoInfo.bind(this);
+    this.handlePlayerStateChange = this.handlePlayerStateChange.bind(this);
+    this.resized = this.resized.bind(this);
+    window.addEventListener('resize', this.resized);
   }
 
   initialState() {
@@ -40,6 +46,8 @@ export class VodSyncApp extends React.PureComponent<
     return {
       accessToken,
       videos: new Map(),
+      width: window.innerWidth / 2 - 6,
+      height: window.innerHeight - 20 - 6,
     };
   }
 
@@ -48,6 +56,14 @@ export class VodSyncApp extends React.PureComponent<
       window.clearInterval(this.interval);
       this.interval = undefined;
     }
+    window.removeEventListener('resize', this.resized);
+  }
+
+  resized() {
+    this.setState({
+      width: window.innerWidth / 2 - 6,
+      height: window.innerHeight - 20 - 6,
+    });
   }
 
   setVideoInfo(id: number, info: VideoInfo) {
@@ -93,15 +109,26 @@ export class VodSyncApp extends React.PureComponent<
 
     return (
       <>
-        <Viewer
-          id={1}
-          clientId={TWITCH_CLIENT_ID}
-          accessToken={this.state.accessToken}
-          setVideoInfo={(info: VideoInfo) => this.setVideoInfo(1, info)}
-          onChange={(playerState: PlayerState) =>
-            this.handlePlayerStateChange(1, playerState)
-          }
-        />
+        <div className="container">
+          <Viewer
+            id={1}
+            clientId={TWITCH_CLIENT_ID}
+            accessToken={this.state.accessToken}
+            setVideoInfo={this.setVideoInfo}
+            onChange={this.handlePlayerStateChange}
+            width={this.state.width}
+            height={this.state.height}
+          />
+          <Viewer
+            id={2}
+            clientId={TWITCH_CLIENT_ID}
+            accessToken={this.state.accessToken}
+            setVideoInfo={this.setVideoInfo}
+            onChange={this.handlePlayerStateChange}
+            width={this.state.width}
+            height={this.state.height}
+          />
+        </div>
         <Timeline
           currentPosition={this.state.currentPosition}
           videos={this.state.videos}

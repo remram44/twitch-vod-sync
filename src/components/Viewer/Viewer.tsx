@@ -7,8 +7,10 @@ interface ViewerProps {
   id: number;
   clientId: string;
   accessToken: string;
-  setVideoInfo: (info: VideoInfo) => void;
-  onChange: (playerState: PlayerState) => void;
+  setVideoInfo: (id: number, info: VideoInfo) => void;
+  onChange: (id: number, playerState: PlayerState) => void;
+  width: number;
+  height: number;
 }
 
 interface ViewerState {
@@ -61,7 +63,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
         videoDate,
         videoDuration,
       });
-      this.props.setVideoInfo({
+      this.props.setVideoInfo(this.props.id, {
         startDate: videoDate,
         duration: videoDuration,
       });
@@ -131,15 +133,33 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     }
     console.log('update state');
     this.playerState = newPlayerState;
-    this.props.onChange(newPlayerState);
+    this.props.onChange(this.props.id, newPlayerState);
     return true;
   }
 
   render() {
     if (this.state.video) {
-      return <div id={'player' + this.props.id} className="player"></div>;
+      return (
+        <div
+          id={'player' + this.props.id}
+          className="player"
+          style={{
+            width: this.props.width + 'px',
+            height: this.props.height + 'px',
+          }}
+        ></div>
+      );
     } else {
-      return <VideoPicker onVideoPicked={this.handleVideoPicked} />;
+      return (
+        <div
+          style={{
+            width: this.props.width + 'px',
+            height: this.props.height + 'px',
+          }}
+        >
+          <VideoPicker onVideoPicked={this.handleVideoPicked} />
+        </div>
+      );
     }
   }
 }
