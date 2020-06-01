@@ -11,32 +11,24 @@ interface TimelineProps {
   currentPosition?: Date;
 }
 
-export class Timeline extends React.PureComponent<TimelineProps> {
-  startDate: Date;
-  endDate: Date;
+export function Timeline(props: TimelineProps) {
+  let videos = Array.from(props.videos.values());
+  let startDate = new Date(
+    Math.min(
+      ...videos.map(v => v.startDate.getTime())
+    )
+  );
+  let endDate = new Date(
+    Math.max(
+      ...videos.map(v => v.startDate.getTime() + v.duration * 1000)
+    )
+  );
 
-  constructor(props: TimelineProps) {
-    super(props);
-    let videos = Array.from(props.videos.values());
-    this.startDate = new Date(
-      Math.min(
-        ...videos.map(v => v.startDate.getTime())
-      )
-    );
-    this.endDate = new Date(
-      Math.max(
-        ...videos.map(v => v.startDate.getTime() + v.duration * 1000)
-      )
-    );
-  }
-
-  render() {
-    return (
-      <div className="timestamps">
-        <div>{formatDate(this.startDate)}</div>
-        <div>{this.props.currentPosition ? formatDate(this.props.currentPosition) : undefined}</div>
-        <div>{formatDate(this.endDate)}</div>
-      </div>
-    );
-  }
+  return (
+    <div className="timestamps">
+      <div>{formatDate(startDate)}</div>
+      <div>{props.currentPosition ? formatDate(props.currentPosition) : undefined}</div>
+      <div>{formatDate(endDate)}</div>
+    </div>
+  );
 }
