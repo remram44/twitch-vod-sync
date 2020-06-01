@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/twitch-vod-sync/static/css/main.626f2b0e.chunk.css",
-    "main.js": "/twitch-vod-sync/static/js/main.eea20466.chunk.js",
-    "main.js.map": "/twitch-vod-sync/static/js/main.eea20466.chunk.js.map",
+    "main.css": "/twitch-vod-sync/static/css/main.7070b98c.chunk.css",
+    "main.js": "/twitch-vod-sync/static/js/main.0dc9c429.chunk.js",
+    "main.js.map": "/twitch-vod-sync/static/js/main.0dc9c429.chunk.js.map",
     "runtime-main.js": "/twitch-vod-sync/static/js/runtime-main.cb77d154.js",
     "runtime-main.js.map": "/twitch-vod-sync/static/js/runtime-main.cb77d154.js.map",
-    "static/js/2.f5cd43f8.chunk.js": "/twitch-vod-sync/static/js/2.f5cd43f8.chunk.js",
-    "static/js/2.f5cd43f8.chunk.js.map": "/twitch-vod-sync/static/js/2.f5cd43f8.chunk.js.map",
+    "static/js/2.b197b317.chunk.js": "/twitch-vod-sync/static/js/2.b197b317.chunk.js",
+    "static/js/2.b197b317.chunk.js.map": "/twitch-vod-sync/static/js/2.b197b317.chunk.js.map",
     "index.html": "/twitch-vod-sync/index.html",
-    "precache-manifest.f92c8cfa90be51409742e1c7ed8cdcf6.js": "/twitch-vod-sync/precache-manifest.f92c8cfa90be51409742e1c7ed8cdcf6.js",
+    "precache-manifest.0029684a9d26b13380dc0adc7c766eae.js": "/twitch-vod-sync/precache-manifest.0029684a9d26b13380dc0adc7c766eae.js",
     "service-worker.js": "/twitch-vod-sync/service-worker.js",
-    "static/css/main.626f2b0e.chunk.css.map": "/twitch-vod-sync/static/css/main.626f2b0e.chunk.css.map",
-    "static/js/2.f5cd43f8.chunk.js.LICENSE.txt": "/twitch-vod-sync/static/js/2.f5cd43f8.chunk.js.LICENSE.txt"
+    "static/css/main.7070b98c.chunk.css.map": "/twitch-vod-sync/static/css/main.7070b98c.chunk.css.map",
+    "static/js/2.b197b317.chunk.js.LICENSE.txt": "/twitch-vod-sync/static/js/2.b197b317.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.cb77d154.js",
-    "static/js/2.f5cd43f8.chunk.js",
-    "static/css/main.626f2b0e.chunk.css",
-    "static/js/main.eea20466.chunk.js"
+    "static/js/2.b197b317.chunk.js",
+    "static/css/main.7070b98c.chunk.css",
+    "static/js/main.0dc9c429.chunk.js"
   ]
 }
