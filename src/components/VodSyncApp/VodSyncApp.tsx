@@ -79,50 +79,45 @@ export class VodSyncApp extends React.PureComponent<
     this.setState(state => {
       const videos = new Map(state.videos);
       videos.set(id, info);
-      return { videos };
-    });
 
-    // Update the player state to fall within at least one video
-    const videosArray = Array.from(this.state.videos.values());
-    const start = Math.min(...videosArray.map(v => v.startDate.getTime()));
-    const end = Math.max(
-      ...videosArray.map(v => v.startDate.getTime() + v.duration * 1000)
-    );
-    if (this.state.playerState.state === 'paused') {
-      if (this.state.playerState.position.getTime() < start) {
-        this.setState({
-          playerState: {
-            state: 'paused',
-            position: new Date(start),
-          },
-        });
-      } else if (this.state.playerState.position.getTime() > end) {
-        this.setState({
-          playerState: {
-            state: 'paused',
-            position: new Date(end),
-          },
-        });
+      // Update the player state to fall within at least one video
+      let playerState = state.playerState;
+      if (state.videos.size > 0) {
+        const videosArray = Array.from(state.videos.values());
+        const start = Math.min(...videosArray.map(v => v.startDate.getTime()));
+        const end = Math.max(
+          ...videosArray.map(v => v.startDate.getTime() + v.duration * 1000)
+        );
+        if (this.state.playerState.state === 'paused') {
+          if (this.state.playerState.position.getTime() < start) {
+            playerState = {
+              state: 'paused',
+              position: new Date(start),
+            };
+          } else if (this.state.playerState.position.getTime() > end) {
+            playerState = {
+              state: 'paused',
+              position: new Date(end),
+            };
+          }
+        } else if (this.state.playerState.state === 'playing') {
+          const minOffset = (start - new Date().getTime()) / 1000.0;
+          const maxOffset = (end - new Date().getTime()) / 1000.0;
+          if (this.state.playerState.offset < minOffset) {
+            playerState = {
+              state: 'playing',
+              offset: minOffset,
+            };
+          } else if (this.state.playerState.offset > maxOffset) {
+            playerState = {
+              state: 'playing',
+              offset: maxOffset,
+            };
+          }
+        }
       }
-    } else if (this.state.playerState.state === 'playing') {
-      const minOffset = (start - new Date().getTime()) / 1000.0;
-      const maxOffset = (end - new Date().getTime()) / 1000.0;
-      if (this.state.playerState.offset < minOffset) {
-        this.setState({
-          playerState: {
-            state: 'playing',
-            offset: minOffset,
-          },
-        });
-      } else if (this.state.playerState.offset > maxOffset) {
-        this.setState({
-          playerState: {
-            state: 'playing',
-            offset: maxOffset,
-          },
-        });
-      }
-    }
+      return { videos, playerState };
+    });
   }
 
   handlePlayerStateChange(id: number, playerState: PlayerState) {
