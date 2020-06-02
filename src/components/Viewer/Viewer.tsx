@@ -8,7 +8,7 @@ interface ViewerProps {
   clientId: string;
   accessToken: string;
   state?: PlayerState;
-  setVideoInfo: (id: number, info: VideoInfo) => void;
+  setVideoInfo: (id: number, info: VideoInfo | undefined) => void;
   onChange: (id: number, playerState: PlayerState) => void;
   width: number;
   height: number;
@@ -28,6 +28,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     this.state = this.initialState();
     this.player = undefined;
     this.handleVideoPicked = this.handleVideoPicked.bind(this);
+    this.reset = this.reset.bind(this);
   }
 
   initialState() {
@@ -98,17 +99,42 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     console.log('Created player', this.player);
   }
 
+  reset() {
+    this.setState({
+      video: undefined,
+      videoDate: undefined,
+      videoDuration: undefined,
+    });
+    this.props.setVideoInfo(this.props.id, undefined);
+  }
+
   render() {
     if (this.state.video) {
       return (
         <div
-          id={'player' + this.props.id}
-          className="player"
           style={{
             width: this.props.width + 'px',
             height: this.props.height + 'px',
           }}
-        ></div>
+        >
+          <div
+            id={'player' + this.props.id}
+            className="player"
+            style={{
+              width: this.props.width + 'px',
+              height: this.props.height - 35 + 'px',
+            }}
+          ></div>
+          <div
+            style={{
+              height: '35px',
+              display: 'flex',
+              justifyContent: 'space-evenly',
+            }}
+          >
+            <input type="button" onClick={this.reset} value="Reset" />
+          </div>
+        </div>
       );
     } else {
       return (

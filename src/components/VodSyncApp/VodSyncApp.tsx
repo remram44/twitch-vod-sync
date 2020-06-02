@@ -74,11 +74,15 @@ export class VodSyncApp extends React.PureComponent<
     });
   }
 
-  setVideoInfo(id: number, info: VideoInfo) {
+  setVideoInfo(id: number, info: VideoInfo | undefined) {
     console.log('setVideoInfo: ', id, ', ', info);
     this.setState(state => {
       const videos = new Map(state.videos);
-      videos.set(id, info);
+      if (info) {
+        videos.set(id, info);
+      } else {
+        videos.delete(id);
+      }
 
       // Update the player state to fall within at least one video
       let playerState = state.playerState;
