@@ -18,12 +18,10 @@ interface ViewerState {
   video?: number;
   videoDate?: Date;
   videoDuration?: number;
-  currentPosition?: Date;
 }
 
 export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   player?: Twitch.Player;
-  interval?: number;
 
   constructor(props: ViewerProps) {
     super(props);
