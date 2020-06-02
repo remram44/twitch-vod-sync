@@ -7,6 +7,7 @@ interface TimelineProps {
   videos: Map<number, VideoInfo>;
   currentPosition?: Date;
   onSeek: (position: Date) => void;
+  onViewersChange: (change: 1 | -1) => void;
 }
 
 function color(id: number) {
@@ -75,18 +76,39 @@ export function Timeline(props: TimelineProps) {
 
   return (
     <div className="timestamps" onClick={handleClick}>
-      <svg style={{ width: '100%', position: 'absolute', height: '100%' }}>
-        {lines}
-        {position}
-      </svg>
-      <div>
-        <div>{formatDate(startDate)}</div>
+      <div className="controls">
+        <input type="button" value="pause" />
+        <input
+          type="button"
+          value="-"
+          onClick={e => {
+            e.preventDefault();
+            props.onViewersChange(-1);
+          }}
+        />
+        <input
+          type="button"
+          value="+"
+          onClick={e => {
+            e.preventDefault();
+            props.onViewersChange(1);
+          }}
+        />
+      </div>
+      <div className="timeline">
+        <svg style={{ width: '100%', position: 'absolute', height: '100%' }}>
+          {lines}
+          {position}
+        </svg>
         <div>
-          {props.currentPosition
-            ? formatDate(props.currentPosition)
-            : undefined}
+          <div>{formatDate(startDate)}</div>
+          <div>
+            {props.currentPosition
+              ? formatDate(props.currentPosition)
+              : undefined}
+          </div>
+          <div>{formatDate(endDate)}</div>
         </div>
-        <div>{formatDate(endDate)}</div>
       </div>
     </div>
   );

@@ -6,6 +6,8 @@ import { Viewer } from '../Viewer/Viewer';
 
 const TWITCH_CLIENT_ID = 'r69vc9claq1m3n960hrkuszot4nx54';
 
+const MAX_VIEWERS = 6;
+
 interface VodSyncAppProps {}
 
 interface VodSyncAppState {
@@ -31,6 +33,7 @@ export class VodSyncApp extends React.PureComponent<
     this.setVideoInfo = this.setVideoInfo.bind(this);
     this.handlePlayerStateChange = this.handlePlayerStateChange.bind(this);
     this.handleSeek = this.handleSeek.bind(this);
+    this.changeViewers = this.changeViewers.bind(this);
     this.resized = this.resized.bind(this);
     window.addEventListener('resize', this.resized);
   }
@@ -50,7 +53,7 @@ export class VodSyncApp extends React.PureComponent<
         position: new Date(1),
       },
       videos: new Map(),
-      width: window.innerWidth / 2 - 6,
+      width: window.innerWidth / 2 - 14,
       height: window.innerHeight - 20 - 6,
       rows: 1,
     };
@@ -79,7 +82,7 @@ export class VodSyncApp extends React.PureComponent<
       let bestRows = 1;
       for (let rows = 1; rows <= state.viewers; ++rows) {
         const cols = Math.ceil(state.viewers / rows);
-        const w = window.innerWidth / cols - 6;
+        const w = window.innerWidth / cols - 14;
         const h = (window.innerHeight - 20) / rows - 6;
         const dist = Math.max(
           Math.abs(w / h - desiredWH),
@@ -93,7 +96,7 @@ export class VodSyncApp extends React.PureComponent<
       const columns = Math.ceil(state.viewers / bestRows);
       return {
         rows: bestRows,
-        width: window.innerWidth / columns - 6,
+        width: window.innerWidth / columns - 14,
         height: (window.innerHeight - 20) / bestRows - 6,
       };
     });
@@ -179,6 +182,14 @@ export class VodSyncApp extends React.PureComponent<
     });
   }
 
+  changeViewers(change: 1 | -1) {
+    this.setState(state => {
+      return {
+        viewers: Math.max(1, Math.min(MAX_VIEWERS, state.viewers + change)),
+      };
+    });
+  }
+
   render() {
     if (!this.state.accessToken) {
       setTimeout(() => {
@@ -214,6 +225,7 @@ export class VodSyncApp extends React.PureComponent<
           currentPosition={this.state.currentPosition}
           videos={this.state.videos}
           onSeek={this.handleSeek}
+          onViewersChange={this.changeViewers}
         />
       </>
     );

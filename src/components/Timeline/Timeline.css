@@ -4,14 +4,29 @@
   left: 0;
   right: 0;
   height: 20px;
+  display: flex;
 }
 
-.timestamps > div {
+.controls {
+  width: 180px;
+}
+
+.controls input {
+  height: 18px;
+  font-size: 60%;
+}
+
+.timeline {
+  position: relative;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.timeline > div {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-
   display: flex;
   justify-content: space-between;
   pointer-events: none;
