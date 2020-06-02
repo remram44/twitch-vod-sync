@@ -18,7 +18,7 @@ export class VideoPicker extends React.PureComponent<VideoPickerProps> {
     if (this.inputRef.current) {
       const value = this.inputRef.current.value;
       const m = value.match(
-        /^(?:https?:\/\/(?:www\.|m\.)?twitch\.tv\/videos\/)?([0-9]+)$/
+        /^(?:https?:\/\/(?:www\.|m\.)?twitch\.tv\/videos\/)?([0-9]+)(?:\?.*)?$/
       );
       if (m) {
         const video = Number(m[1]);
