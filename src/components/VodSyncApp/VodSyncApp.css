@@ -18,3 +18,11 @@
   border: 1px solid black;
   margin: 2px;
 }
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  align-items: center;
+}

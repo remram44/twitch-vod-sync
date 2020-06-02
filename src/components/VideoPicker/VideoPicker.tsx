@@ -34,15 +34,17 @@ export class VideoPicker extends React.PureComponent<VideoPickerProps> {
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
-        <input
-          type="text"
-          name="video"
-          ref={this.inputRef}
-          placeholder="Twitch video URL"
-        />
-        <input type="submit" value="Watch" />
-      </form>
+      <div className="picker">
+        <form onSubmit={this.handleSubmit}>
+          <input
+            type="text"
+            name="video"
+            ref={this.inputRef}
+            placeholder="Twitch video URL"
+          />
+          <input type="submit" value="Watch" />
+        </form>
+      </div>
     );
   }
 }
