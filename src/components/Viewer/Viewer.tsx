@@ -32,6 +32,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     this.delayRef = React.createRef();
     this.handleVideoPicked = this.handleVideoPicked.bind(this);
     this.handleDelayChange = this.handleDelayChange.bind(this);
+    this.handlePlayerEvent = this.handlePlayerEvent.bind(this);
     this.reset = this.reset.bind(this);
   }
 
@@ -105,7 +106,22 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
       video,
       autoplay: false,
     });
+    this.player.addEventListener(Twitch.Player.PLAYING, this.handlePlayerEvent);
+    this.player.addEventListener(Twitch.Player.PAUSE, this.handlePlayerEvent);
+    this.player.addEventListener(Twitch.Player.PAUSE, this.handlePlayerEvent);
     console.log('Created player', this.player);
+  }
+
+  handlePlayerEvent() {
+    if (!this.player || !this.props.state) {
+      return;
+    }
+    if (this.player.isPaused() && this.props.state.state === 'playing') {
+      // TODO: Pause everyone?
+    } else if (!this.player.isPaused() && this.props.state.state === 'paused') {
+      this.player.pause();
+      this.player.seek(TODO);
+    }
   }
 
   handleDelayChange(evt: React.FormEvent) {
