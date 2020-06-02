@@ -70,9 +70,29 @@ export class VodSyncApp extends React.PureComponent<
   }
 
   resized() {
-    this.setState({
-      width: window.innerWidth / this.state.viewers - 6,
-      height: window.innerHeight - 20 - 6,
+    const desiredWH = 4.0 / 3.0;
+    const desiredHW = 1.0 / desiredWH;
+    this.setState(state => {
+      let bestDist = 999999.0;
+      let bestRows = 1;
+      for (let rows = 1; rows <= state.viewers; ++rows) {
+        const cols = Math.ceil(state.viewers / rows);
+        const w = window.innerWidth / cols - 6;
+        const h = (window.innerHeight - 20) / rows - 6;
+        const dist = Math.max(
+          Math.abs(w / h - desiredWH),
+          Math.abs(h / w - desiredHW)
+        );
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestRows = rows;
+        }
+      }
+      const columns = Math.ceil(state.viewers / bestRows);
+      return {
+        width: window.innerWidth / columns - 6,
+        height: (window.innerHeight - 20) / bestRows - 6,
+      };
     });
   }
 
