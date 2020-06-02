@@ -10,6 +10,7 @@ interface VodSyncAppProps {}
 
 interface VodSyncAppState {
   accessToken: string | null;
+  viewers: number;
   playerState: PlayerState;
   currentPosition?: Date;
   videos: Map<number, VideoInfo>;
@@ -42,6 +43,7 @@ export class VodSyncApp extends React.PureComponent<
     }
     return {
       accessToken,
+      viewers: 2,
       playerState: {
         state: 'paused',
         position: new Date(1),
@@ -69,7 +71,7 @@ export class VodSyncApp extends React.PureComponent<
 
   resized() {
     this.setState({
-      width: window.innerWidth / 2 - 6,
+      width: window.innerWidth / this.state.viewers - 6,
       height: window.innerHeight - 20 - 6,
     });
   }
@@ -165,30 +167,26 @@ export class VodSyncApp extends React.PureComponent<
       return <p>Redirecting you to Twitch to authorize use of their API...</p>;
     }
 
+    const viewers = [];
+    for (let i = 0; i < this.state.viewers; ++i) {
+      viewers.push(
+        <Viewer
+          id={i}
+          key={i}
+          clientId={TWITCH_CLIENT_ID}
+          accessToken={this.state.accessToken}
+          state={this.state.playerState}
+          setVideoInfo={this.setVideoInfo}
+          onChange={this.handlePlayerStateChange}
+          width={this.state.width}
+          height={this.state.height}
+        />
+      );
+    }
+
     return (
       <>
-        <div className="container">
-          <Viewer
-            id={1}
-            clientId={TWITCH_CLIENT_ID}
-            accessToken={this.state.accessToken}
-            state={this.state.playerState}
-            setVideoInfo={this.setVideoInfo}
-            onChange={this.handlePlayerStateChange}
-            width={this.state.width}
-            height={this.state.height}
-          />
-          <Viewer
-            id={2}
-            clientId={TWITCH_CLIENT_ID}
-            accessToken={this.state.accessToken}
-            state={this.state.playerState}
-            setVideoInfo={this.setVideoInfo}
-            onChange={this.handlePlayerStateChange}
-            width={this.state.width}
-            height={this.state.height}
-          />
-        </div>
+        <div className="container">{viewers}</div>
         <Timeline
           currentPosition={this.state.currentPosition}
           videos={this.state.videos}

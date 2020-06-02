@@ -10,15 +10,15 @@ interface TimelineProps {
 }
 
 function color(id: number) {
-  if (id === 1) {
+  if (id === 0) {
     return '#aaf';
-  } else if (id === 2) {
+  } else if (id === 1) {
     return '#faa';
-  } else if (id === 3) {
+  } else if (id === 2) {
     return '#afa';
-  } else if (id === 4) {
+  } else if (id === 3) {
     return '#aff';
-  } else if (id === 5) {
+  } else if (id === 4) {
     return '#faf';
   } else {
     return '#ffa';
