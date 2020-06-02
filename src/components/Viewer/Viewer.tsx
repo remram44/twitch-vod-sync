@@ -15,6 +15,7 @@ interface ViewerProps {
 }
 
 interface ViewerState {
+  delay: number;
   video?: number;
   videoDate?: Date;
   videoDuration?: number;
@@ -22,23 +23,29 @@ interface ViewerState {
 
 export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   player?: Twitch.Player;
+  delayRef?: React.RefObject<HTMLInputElement>;
 
   constructor(props: ViewerProps) {
     super(props);
     this.state = this.initialState();
     this.player = undefined;
+    this.delayRef = React.createRef();
     this.handleVideoPicked = this.handleVideoPicked.bind(this);
+    this.handleDelayChange = this.handleDelayChange.bind(this);
     this.reset = this.reset.bind(this);
   }
 
   initialState() {
-    return {};
+    return {
+      delay: 0,
+    };
   }
 
-  componentDidUpdate(prevProps: ViewerProps) {
+  componentDidUpdate(prevProps: ViewerProps, prevState: ViewerState) {
     if (
       this.props.state &&
-      this.props.state !== prevProps.state &&
+      (this.props.state !== prevProps.state ||
+        this.state.delay !== prevState.delay) &&
       this.player &&
       this.state.videoDate
     ) {
@@ -47,13 +54,15 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
         this.player.seek(
           (this.props.state.position.getTime() -
             this.state.videoDate.getTime()) /
-            1000.0
+            1000.0 +
+            this.state.delay
         );
       } else if (this.props.state.state === 'playing') {
         const seek =
           new Date().getTime() / 1000.0 +
           this.props.state.offset -
-          this.state.videoDate.getTime() / 1000.0;
+          this.state.videoDate.getTime() / 1000.0 +
+          this.state.delay;
         this.player.seek(seek);
         this.player.play();
       }
@@ -99,8 +108,21 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     console.log('Created player', this.player);
   }
 
+  handleDelayChange(evt: React.FormEvent) {
+    evt.preventDefault();
+    if (this.delayRef?.current) {
+      let delay = Number(this.delayRef.current.value);
+      if (isNaN(delay)) {
+        delay = 0;
+      }
+      this.setState({ delay });
+      this.delayRef.current.value = '' + delay;
+    }
+  }
+
   reset() {
     this.setState({
+      delay: 0,
       video: undefined,
       videoDate: undefined,
       videoDuration: undefined,
@@ -132,6 +154,16 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
               justifyContent: 'space-evenly',
             }}
           >
+            <form onSubmit={this.handleDelayChange}>
+              Delay:{' '}
+              <input
+                type="text"
+                name="delay"
+                ref={this.delayRef}
+                defaultValue={this.state.delay}
+              />{' '}
+              <input type="submit" value="Set" />
+            </form>
             <input type="button" onClick={this.reset} value="Reset" />
           </div>
         </div>
