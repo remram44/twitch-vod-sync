@@ -7,6 +7,7 @@ interface TimelineProps {
   videos: Map<number, VideoInfo>;
   currentPosition?: Date;
   onSeek: (position: Date) => void;
+  onViewersChange: (change: 1 | -1) => void;
 }
 
 function color(id: number) {
@@ -81,7 +82,25 @@ export function Timeline(props: TimelineProps) {
 
   return (
     <>
-      {/*<div className="buttons">Play/pause</div>*/}
+      <div className="buttons">
+        <input type="button" value="pause" />
+        <input
+          type="button"
+          value="-"
+          onClick={e => {
+            e.preventDefault();
+            props.onViewersChange(-1);
+          }}
+        />
+        <input
+          type="button"
+          value="+"
+          onClick={e => {
+            e.preventDefault();
+            props.onViewersChange(1);
+          }}
+        />
+      </div>
       <div className="timestamps" ref={tsRef} onClick={handleClick}>
         <svg>
           {lines}

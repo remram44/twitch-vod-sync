@@ -9,6 +9,8 @@ const TWITCH_CLIENT_ID = 'r69vc9claq1m3n960hrkuszot4nx54';
 // Assumed aspect ratio
 const ASPECT_RATIO = 16.0 / 9.0;
 
+const MAX_VIEWERS = 6;
+
 interface VodSyncAppProps {}
 
 interface VodSyncAppState {
@@ -34,6 +36,7 @@ export class VodSyncApp extends React.PureComponent<
     this.setVideoInfo = this.setVideoInfo.bind(this);
     this.handlePlayerStateChange = this.handlePlayerStateChange.bind(this);
     this.handleSeek = this.handleSeek.bind(this);
+    this.changeViewers = this.changeViewers.bind(this);
     this.resized = this.resized.bind(this);
     window.addEventListener('resize', this.resized);
   }
@@ -53,11 +56,12 @@ export class VodSyncApp extends React.PureComponent<
         position: new Date(1),
       },
       videos: new Map(),
-      width: window.innerWidth / 2 - 6,
+      width: window.innerWidth / 2 - 14,
     };
   }
 
   componentDidMount() {
+    this.resized();
     this.interval = window.setInterval(
       this.computeCurrentPosition.bind(this),
       1000
@@ -89,7 +93,7 @@ export class VodSyncApp extends React.PureComponent<
       for (let rows = 1; rows <= state.viewers; ++rows) {
         const cols = Math.ceil(state.viewers / rows);
         // Size of the area for each viewer, if we get this number of rows
-        const wt = totalW / cols - 6;
+        const wt = totalW / cols - 14;
         const ht = totalH / rows - 6;
         // Size of the in this area with the right aspect ratio
         const w = Math.min(wt, ht * ASPECT_RATIO);
@@ -104,7 +108,7 @@ export class VodSyncApp extends React.PureComponent<
       const columns = Math.ceil(state.viewers / bestRows);
       document.title = `${Math.sqrt(bestSquareDiag)}`;
       return {
-        width: totalW / columns - 6,
+        width: totalW / columns - 14,
       };
     });
   }
@@ -189,6 +193,15 @@ export class VodSyncApp extends React.PureComponent<
     });
   }
 
+  changeViewers(change: 1 | -1) {
+    this.setState(state => {
+      return {
+        viewers: Math.max(1, Math.min(MAX_VIEWERS, state.viewers + change)),
+      };
+    });
+    this.resized();
+  }
+
   render() {
     if (!this.state.accessToken) {
       setTimeout(() => {
@@ -224,6 +237,7 @@ export class VodSyncApp extends React.PureComponent<
             currentPosition={this.state.currentPosition}
             videos={this.state.videos}
             onSeek={this.handleSeek}
+            onViewersChange={this.changeViewers}
           />
         </div>
       </div>
