@@ -15,7 +15,6 @@ interface VodSyncAppState {
   currentPosition?: Date;
   videos: Map<number, VideoInfo>;
   width: number;
-  height: number;
 }
 
 export class VodSyncApp extends React.PureComponent<
@@ -50,7 +49,6 @@ export class VodSyncApp extends React.PureComponent<
       },
       videos: new Map(),
       width: window.innerWidth / 2 - 6,
-      height: window.innerHeight - 20 - 6,
     };
   }
 
@@ -91,7 +89,6 @@ export class VodSyncApp extends React.PureComponent<
       const columns = Math.ceil(state.viewers / bestRows);
       return {
         width: window.innerWidth / columns - 6,
-        height: (window.innerHeight - 20) / bestRows - 6,
       };
     });
   }
@@ -199,7 +196,6 @@ export class VodSyncApp extends React.PureComponent<
           setVideoInfo={this.setVideoInfo}
           onChange={this.handlePlayerStateChange}
           width={this.state.width}
-          height={this.state.height}
         />
       );
     }

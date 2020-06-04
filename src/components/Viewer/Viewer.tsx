@@ -12,7 +12,6 @@ interface ViewerProps {
   setVideoInfo: (id: number, info: VideoInfo | undefined) => void;
   onChange: (id: number, playerState: PlayerState) => void;
   width: number;
-  height: number;
 }
 
 interface ViewerState {
@@ -138,7 +137,6 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
           className="viewer"
           style={{
             width: this.props.width + 'px',
-            height: this.props.height + 'px',
           }}
         >
           <div id={'player' + this.props.id} className="player"></div>
@@ -163,7 +161,6 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
           className="viewer"
           style={{
             width: this.props.width + 'px',
-            height: this.props.height + 'px',
           }}
         >
           <VideoPicker onVideoPicked={this.handleVideoPicked} />
