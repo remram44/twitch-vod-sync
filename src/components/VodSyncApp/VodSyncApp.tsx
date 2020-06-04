@@ -205,14 +205,16 @@ export class VodSyncApp extends React.PureComponent<
     }
 
     return (
-      <>
-        <div className="container">{viewers}</div>
-        <Timeline
-          currentPosition={this.state.currentPosition}
-          videos={this.state.videos}
-          onSeek={this.handleSeek}
-        />
-      </>
+      <div className="view-container">
+        <div className="videos">{viewers}</div>
+        <div className="timeline">
+          <Timeline
+            currentPosition={this.state.currentPosition}
+            videos={this.state.videos}
+            onSeek={this.handleSeek}
+          />
+        </div>
+      </div>
     );
   }
 }

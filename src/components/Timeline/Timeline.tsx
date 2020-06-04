@@ -43,8 +43,14 @@ export function Timeline(props: TimelineProps) {
   const s = startDate.getTime(),
     e = endDate.getTime();
 
+  const tsRef: React.RefObject<HTMLDivElement> = React.createRef();
+
   function handleClick(evt: React.MouseEvent) {
-    const ratio = evt.clientX / window.innerWidth;
+    if (!tsRef.current) {
+      return;
+    }
+    const bounds = tsRef.current.getBoundingClientRect();
+    const ratio = (evt.clientX - bounds.x) / bounds.width;
     props.onSeek(new Date(s + (e - s) * ratio));
   }
 
@@ -74,20 +80,23 @@ export function Timeline(props: TimelineProps) {
   }
 
   return (
-    <div className="timestamps" onClick={handleClick}>
-      <svg style={{ width: '100%', position: 'absolute', height: '100%' }}>
-        {lines}
-        {position}
-      </svg>
-      <div>
-        <div>{formatDate(startDate)}</div>
+    <>
+      {/*<div className="buttons">Play/pause</div>*/}
+      <div className="timestamps" ref={tsRef} onClick={handleClick}>
+        <svg>
+          {lines}
+          {position}
+        </svg>
         <div>
-          {props.currentPosition
-            ? formatDate(props.currentPosition)
-            : undefined}
+          <div>{formatDate(startDate)}</div>
+          <div>
+            {props.currentPosition
+              ? formatDate(props.currentPosition)
+              : undefined}
+          </div>
+          <div>{formatDate(endDate)}</div>
         </div>
-        <div>{formatDate(endDate)}</div>
       </div>
-    </div>
+    </>
   );
 }

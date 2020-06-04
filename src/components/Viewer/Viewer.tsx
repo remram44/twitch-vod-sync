@@ -2,6 +2,7 @@ import React from 'react';
 import { VideoInfo, PlayerState } from '../../types';
 import { parseDuration } from '../../utils';
 import { VideoPicker } from '../VideoPicker/VideoPicker';
+import './Viewer.css';
 
 interface ViewerProps {
   id: number;
@@ -134,26 +135,14 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     if (this.state.video) {
       return (
         <div
+          className="viewer"
           style={{
             width: this.props.width + 'px',
             height: this.props.height + 'px',
           }}
         >
-          <div
-            id={'player' + this.props.id}
-            className="player"
-            style={{
-              width: this.props.width + 'px',
-              height: this.props.height - 35 + 'px',
-            }}
-          ></div>
-          <div
-            style={{
-              height: '35px',
-              display: 'flex',
-              justifyContent: 'space-evenly',
-            }}
-          >
+          <div id={'player' + this.props.id} className="player"></div>
+          <div className="options">
             <form onSubmit={this.handleDelayChange}>
               Delay:{' '}
               <input
@@ -171,6 +160,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     } else {
       return (
         <div
+          className="viewer"
           style={{
             width: this.props.width + 'px',
             height: this.props.height + 'px',

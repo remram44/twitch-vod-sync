@@ -1,0 +1,23 @@
+.viewer {
+  border: 1px solid black;
+  margin: 2px;
+}
+
+/* Position the options under the player */
+.viewer {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: stretch;
+}
+.viewer .player {
+  flex: 1 1 auto;
+}
+.viewer .options {
+  flex: 0 0 auto;
+}
+
+/* Position elements in options */
+.viewer .options {
+  display: flex;
+  justify-content: space-evenly;
+}

@@ -1,24 +1,39 @@
-.container {
-  position: fixed;
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.view-container {
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 20px;
+  bottom: 0;
 }
 
-.container {
+/* Position videos above timeline, giving the timeline a fixed size */
+.view-container {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: column nowrap;
+}
+.videos {
+  flex: 1 1 auto;
+}
+.timeline {
+  flex: 0 0 auto;
 }
 
-.container>div {
-  width: 200px;
-  height: 200px;
-  border: 1px solid black;
-  margin: 2px;
+/* Position the videos in their container in rows */
+.videos {
+  display: flex;
+  flex-flow: row wrap;
+}
+.videos > div {
+  flex: 1 0 auto;
+  align-items: stretch;
 }
 
+/* Center content of picker */
 .picker {
   display: flex;
   flex-direction: column;
