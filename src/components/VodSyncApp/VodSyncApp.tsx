@@ -6,6 +6,9 @@ import { Viewer } from '../Viewer/Viewer';
 
 const TWITCH_CLIENT_ID = 'r69vc9claq1m3n960hrkuszot4nx54';
 
+// Assumed aspect ratio
+const ASPECT_RATIO = 16.0 / 9.0;
+
 interface VodSyncAppProps {}
 
 interface VodSyncAppState {
@@ -22,10 +25,12 @@ export class VodSyncApp extends React.PureComponent<
   VodSyncAppState
 > {
   interval?: number;
+  containerRef: React.RefObject<HTMLDivElement>;
 
   constructor(props: VodSyncAppProps) {
     super(props);
     this.state = this.initialState();
+    this.containerRef = React.createRef();
     this.setVideoInfo = this.setVideoInfo.bind(this);
     this.handlePlayerStateChange = this.handlePlayerStateChange.bind(this);
     this.handleSeek = this.handleSeek.bind(this);
@@ -68,27 +73,38 @@ export class VodSyncApp extends React.PureComponent<
   }
 
   resized() {
-    const desiredWH = 4.0 / 3.0;
-    const desiredHW = 1.0 / desiredWH;
     this.setState(state => {
-      let bestDist = 999999.0;
+      // Measure the space we have to fill
+      let totalW = window.innerWidth;
+      let totalH = window.innerHeight - 20;
+      if (this.containerRef.current) {
+        const size = this.containerRef.current.getBoundingClientRect();
+        totalW = size.width;
+        totalH = size.height;
+      }
+      // Find the number of rows to use
+      // We pick the one with the best diagonal for videos
+      let bestSquareDiag = 0.0;
       let bestRows = 1;
       for (let rows = 1; rows <= state.viewers; ++rows) {
         const cols = Math.ceil(state.viewers / rows);
-        const w = window.innerWidth / cols - 6;
-        const h = (window.innerHeight - 20) / rows - 6;
-        const dist = Math.max(
-          Math.abs(w / h - desiredWH),
-          Math.abs(h / w - desiredHW)
-        );
-        if (dist < bestDist) {
-          bestDist = dist;
+        // Size of the area for each viewer, if we get this number of rows
+        const wt = totalW / cols - 6;
+        const ht = totalH / rows - 6;
+        // Size of the in this area with the right aspect ratio
+        const w = Math.min(wt, ht * ASPECT_RATIO);
+        const h = Math.min(ht, wt / ASPECT_RATIO);
+        // Compute the diagonal and update the best value
+        const squareDiag = w * w + h * h;
+        if (squareDiag > bestSquareDiag) {
+          bestSquareDiag = squareDiag;
           bestRows = rows;
         }
       }
       const columns = Math.ceil(state.viewers / bestRows);
+      document.title = `${Math.sqrt(bestSquareDiag)}`;
       return {
-        width: window.innerWidth / columns - 6,
+        width: totalW / columns - 6,
       };
     });
   }
@@ -201,7 +217,7 @@ export class VodSyncApp extends React.PureComponent<
     }
 
     return (
-      <div className="view-container">
+      <div className="view-container" ref={this.containerRef}>
         <div className="videos">{viewers}</div>
         <div className="timeline">
           <Timeline
