@@ -12,14 +12,14 @@ This application can bring up multiple VOD (recorded streams), obtain their star
 Work in progress!
 -----------------
 
-This project is not complete but is already pretty usable.
+This project is pretty much done! Suggestions and patches welcome.
 
 * [x] Show the **real timestamp** while playing Twitch videos (obtained from API)
 * [x] Show multiple Twitch videos in the same browser tab
-  * [ ] Show more than 2 [#6](https://github.com/remram44/twitch-vod-sync/issues/6)
+  * [x] Show more than 2
 * [x] Play the streams synced
   * [x] Account for streams using different delays
-* [ ] Pause button to pause all streams [#7](https://github.com/remram44/twitch-vod-sync/issues/7)
+* [x] Pause button to pause all streams
 * [ ] Detect if users acts on a stream directly (rather than with the timeline at the bottom) and do something about it [#8](https://github.com/remram44/twitch-vod-sync/issues/8)
 
 FAQ
