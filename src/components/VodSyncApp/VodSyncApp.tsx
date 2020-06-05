@@ -107,7 +107,6 @@ export class VodSyncApp extends React.PureComponent<
         }
       }
       const columns = Math.ceil(state.viewers / bestRows);
-      document.title = `${Math.sqrt(bestSquareDiag)}`;
       return {
         width: totalW / columns - 14,
       };
