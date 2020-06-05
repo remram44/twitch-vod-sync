@@ -37,6 +37,7 @@ export class VodSyncApp extends React.PureComponent<
     this.handlePlayerStateChange = this.handlePlayerStateChange.bind(this);
     this.handleSeek = this.handleSeek.bind(this);
     this.changeViewers = this.changeViewers.bind(this);
+    this.changePlaying = this.changePlaying.bind(this);
     this.resized = this.resized.bind(this);
     window.addEventListener('resize', this.resized);
   }
@@ -202,6 +203,28 @@ export class VodSyncApp extends React.PureComponent<
     this.resized();
   }
 
+  changePlaying(playing: boolean) {
+    if (playing && this.state.playerState.state === 'paused') {
+      this.setState({
+        playerState: {
+          state: 'playing',
+          offset:
+            (this.state.playerState.position.getTime() - new Date().getTime()) /
+            1000.0,
+        },
+      });
+    } else if (!playing && this.state.playerState.state === 'playing') {
+      this.setState({
+        playerState: {
+          state: 'paused',
+          position: new Date(
+            new Date().getTime() + this.state.playerState.offset * 1000.0
+          ),
+        },
+      });
+    }
+  }
+
   render() {
     if (!this.state.accessToken) {
       setTimeout(() => {
@@ -235,9 +258,11 @@ export class VodSyncApp extends React.PureComponent<
         <div className="timeline">
           <Timeline
             currentPosition={this.state.currentPosition}
+            playing={this.state.playerState.state === 'playing'}
             videos={this.state.videos}
             onSeek={this.handleSeek}
             onViewersChange={this.changeViewers}
+            onPlayingStateChange={this.changePlaying}
           />
         </div>
       </div>

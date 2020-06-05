@@ -6,8 +6,10 @@ import './Timeline.css';
 interface TimelineProps {
   videos: Map<number, VideoInfo>;
   currentPosition?: Date;
+  playing: boolean;
   onSeek: (position: Date) => void;
   onViewersChange: (change: 1 | -1) => void;
+  onPlayingStateChange: (playing: boolean) => void;
 }
 
 function color(id: number) {
@@ -55,6 +57,10 @@ export function Timeline(props: TimelineProps) {
     props.onSeek(new Date(s + (e - s) * ratio));
   }
 
+  function handlePlayPause() {
+    props.onPlayingStateChange(!props.playing);
+  }
+
   const lineHeight = 100.0 / videos.length;
 
   const lines = videos.map(([id, info], idx) => (
@@ -83,7 +89,11 @@ export function Timeline(props: TimelineProps) {
   return (
     <>
       <div className="buttons">
-        <input type="button" value="pause" />
+        <input
+          type="button"
+          value={props.playing ? 'pause' : 'play'}
+          onClick={handlePlayPause}
+        />
         <input
           type="button"
           value="-"
