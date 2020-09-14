@@ -195,8 +195,19 @@ export class VodSyncApp extends React.PureComponent<
 
   changeViewers(change: 1 | -1) {
     this.setState(state => {
+      const viewers = Math.max(
+        1,
+        Math.min(MAX_VIEWERS, state.viewers + change)
+      );
+      const videos = new Map();
+      state.videos.forEach((info, id) => {
+        if (id < viewers) {
+          videos.set(id, info);
+        }
+      });
       return {
-        viewers: Math.max(1, Math.min(MAX_VIEWERS, state.viewers + change)),
+        viewers,
+        videos,
       };
     });
     this.resized();
