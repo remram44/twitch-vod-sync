@@ -95,8 +95,8 @@ export class VodSyncApp extends React.PureComponent<
         const cols = Math.ceil(state.viewers / rows);
         // Size of the area for each viewer, if we get this number of rows
         const wt = totalW / cols - 14;
-        const ht = totalH / rows - 6;
-        // Size of the in this area with the right aspect ratio
+        const ht = totalH / rows - 6 - 33;
+        // Size of this area with the right aspect ratio
         const w = Math.min(wt, ht * ASPECT_RATIO);
         const h = Math.min(ht, wt / ASPECT_RATIO);
         // Compute the diagonal and update the best value
