@@ -10,6 +10,7 @@ interface ViewerProps {
   accessToken: string;
   state?: PlayerState;
   setVideoInfo: (id: number, info: VideoInfo | undefined) => void;
+  setPlayerReady: () => void;
   onChange: (id: number, playerState: PlayerState) => void;
   width: number;
 }
@@ -34,6 +35,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     this.handleVideoPicked = this.handleVideoPicked.bind(this);
     this.handleDelayChange = this.handleDelayChange.bind(this);
     this.reset = this.reset.bind(this);
+    this.startedPlaying = this.startedPlaying.bind(this);
   }
 
   initialState() {
@@ -65,6 +67,14 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
             1000.0 +
             this.state.delay
         );
+      } else if (this.props.state.state === 'buffering') {
+        this.player.seek(
+          (this.props.state.position.getTime() -
+            this.state.videoDate.getTime()) /
+            1000.0 +
+            this.state.delay
+        );
+        this.player.play();
       } else if (this.props.state.state === 'playing') {
         const seek =
           new Date().getTime() / 1000.0 +
@@ -129,7 +139,16 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
       video,
       autoplay: false,
     });
+    this.player.addEventListener(Twitch.Player.PLAYING, this.startedPlaying);
     console.log('Created player', this.player);
+  }
+
+  startedPlaying() {
+    if (this.player && this.props.state?.state === 'buffering') {
+      // Pause for now, wait for all videos to be ready
+      this.player.pause();
+      this.props.setPlayerReady();
+    }
   }
 
   handleDelayChange(evt: React.FormEvent) {

@@ -170,7 +170,10 @@ export class VodSyncApp extends React.PureComponent<
   computeCurrentPosition() {
     this.setState(state => {
       let currentPosition;
-      if (state.playerState?.state === 'paused') {
+      if (
+        state.playerState?.state === 'paused' ||
+        state.playerState?.state === 'buffering'
+      ) {
         currentPosition = state.playerState.position;
       } else if (state.playerState?.state === 'playing') {
         currentPosition = new Date(
@@ -184,13 +187,31 @@ export class VodSyncApp extends React.PureComponent<
   }
 
   handleSeek(position: Date) {
-    const offset = (position.getTime() - new Date().getTime()) / 1000.0;
+    // Go to buffering state
     this.setState({
       playerState: {
-        state: 'playing',
-        offset,
+        state: 'buffering',
+        position,
+        videosBuffering: new Set(this.state.videos.keys()),
       },
     });
+  }
+
+  handlePlayerReady(id: number) {
+    const playerState = this.state.playerState;
+    if (playerState.state === 'buffering') {
+      const { position, videosBuffering } = playerState;
+      videosBuffering.delete(id);
+      if (videosBuffering.size === 0) {
+        const offset = (position.getTime() - new Date().getTime()) / 1000.0;
+        this.setState({
+          playerState: {
+            state: 'playing',
+            offset,
+          },
+        });
+      }
+    }
   }
 
   changeViewers(change: 1 | -1) {
@@ -256,6 +277,7 @@ export class VodSyncApp extends React.PureComponent<
           accessToken={this.state.accessToken}
           state={this.state.playerState}
           setVideoInfo={this.setVideoInfo}
+          setPlayerReady={() => this.handlePlayerReady(i)}
           onChange={this.handlePlayerStateChange}
           width={this.state.width}
         />
@@ -268,7 +290,7 @@ export class VodSyncApp extends React.PureComponent<
         <div className="timeline">
           <Timeline
             currentPosition={this.state.currentPosition}
-            playing={this.state.playerState.state === 'playing'}
+            playing={this.state.playerState.state !== 'paused'}
             videos={this.state.videos}
             onSeek={this.handleSeek}
             onViewersChange={this.changeViewers}

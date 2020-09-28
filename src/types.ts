@@ -8,9 +8,18 @@ export interface PlayerStatePaused {
   position: Date;
 }
 
+export interface PlayerStateBuffering {
+  state: 'buffering';
+  position: Date;
+  videosBuffering: Set<number>;
+}
+
 export interface PlayerStatePlaying {
   state: 'playing';
   offset: number;
 }
 
-export type PlayerState = PlayerStatePaused | PlayerStatePlaying;
+export type PlayerState =
+  | PlayerStatePaused
+  | PlayerStateBuffering
+  | PlayerStatePlaying;
