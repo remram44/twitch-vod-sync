@@ -24,6 +24,7 @@ interface ViewerState {
 export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   player?: Twitch.Player;
   delayRef?: React.RefObject<HTMLInputElement>;
+  startTimer?: number;
 
   constructor(props: ViewerProps) {
     super(props);
@@ -42,12 +43,19 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   }
 
   componentDidUpdate(prevProps: ViewerProps, prevState: ViewerState) {
+    // Clear previous timer
+    if (this.startTimer !== undefined) {
+      window.clearTimeout(this.startTimer);
+    }
+    this.startTimer = undefined;
+
     if (
       this.props.state &&
       (this.props.state !== prevProps.state ||
         this.state.delay !== prevState.delay) &&
       this.player &&
-      this.state.videoDate
+      this.state.videoDate &&
+      this.state.videoDuration
     ) {
       if (this.props.state.state === 'paused') {
         this.player.pause();
@@ -63,8 +71,24 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
           this.props.state.offset -
           this.state.videoDate.getTime() / 1000.0 +
           this.state.delay;
-        this.player.seek(seek);
-        this.player.play();
+        if (seek > this.state.videoDuration) {
+          // After the end - stop playback
+          this.player.pause();
+        } else if (seek < 0.0) {
+          // Before the beginning - stop and set timer to start later
+          this.player.seek(0);
+          this.player.pause();
+          this.startTimer = window.setTimeout(() => {
+            if (this.player) {
+              this.player.seek(0);
+              this.player.play();
+            }
+          }, -seek * 1000);
+        } else {
+          // In range - seek
+          this.player.seek(seek);
+          this.player.play();
+        }
       }
     }
   }
