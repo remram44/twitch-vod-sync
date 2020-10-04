@@ -42,7 +42,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   initialState() {
     return {
       delay: 0,
-      delayFormat: "0"
+      delayFormat: '0'
     };
   }
 
