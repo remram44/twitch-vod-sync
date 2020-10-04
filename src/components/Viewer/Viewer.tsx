@@ -42,7 +42,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   initialState() {
     return {
       delay: 0,
-      delayFormat: '0'
+      delayFormat: '0',
     };
   }
 
@@ -156,11 +156,13 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   handleDelayChange(evt: React.FormEvent) {
     evt.preventDefault();
     if (this.delayRef?.current) {
-      const {delayFormat, delaySeconds} = computeDelay(this.delayRef.current.value);
-      
+      const { delayFormat, delaySeconds } = computeDelay(
+        this.delayRef.current.value
+      );
+
       this.setState({
         delay: delaySeconds,
-        delayFormat
+        delayFormat,
       });
       this.delayRef.current.value = delayFormat;
     }
@@ -169,7 +171,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   reset() {
     this.setState({
       delay: 0,
-      delayFormat: "0",
+      delayFormat: '0',
       video: undefined,
       videoDate: undefined,
       videoDuration: undefined,

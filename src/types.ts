@@ -25,6 +25,6 @@ export type PlayerState =
   | PlayerStatePlaying;
 
 export interface PlayerDelayTime {
-  delayFormat: string,
-  delaySeconds: number
+  delayFormat: string;
+  delaySeconds: number;
 }
