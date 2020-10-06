@@ -73,8 +73,12 @@ export function computeDelay(time: string): PlayerDelayTime {
 
     if (time.includes(COLON_STRING)) {
       const timeStringList: string[] = time.split(COLON_STRING);
-      if (timeStringList.length !== 3) throw new Error('Invalid time');
-      cleanTimeList = timeStringList;
+
+      if (!(timeStringList.length === 2 || timeStringList.length === 3)) {
+        throw new Error('Invalid time');
+      }
+      const [hh, mm, ss = '0'] = timeStringList;
+      cleanTimeList = [hh, mm, ss];
     } else if (time.includes(MINUTE_STRING)) {
       cleanTimeList[1] = time.split(MINUTE_STRING)[0];
     } else {
