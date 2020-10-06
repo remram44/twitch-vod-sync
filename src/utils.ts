@@ -1,5 +1,3 @@
-import { PlayerDelayTime } from './types';
-
 function npad(num: number, size: number): string {
   let s = '' + num;
   while (s.length < size) {
@@ -51,18 +49,8 @@ function normalizeTime(time: number[]): number[] {
   return time;
 }
 
-function prettifyTime(time: number[]): string[] {
-  const prettyTime = time.map(num => ('0' + num).slice(-2));
-  return prettyTime;
-}
-
-export function computeDelay(time: string): PlayerDelayTime {
-  const playerDelay: PlayerDelayTime = {
-    delayFormat: '0',
-    delaySeconds: 0,
-  };
-
-  if (!time.length) return playerDelay;
+export function computeDelay(time: string): number {
+  if (!time.length) return 0;
   const isNegative: boolean = time[0] === '-';
   if (isNegative) time = time.substr(1);
 
@@ -89,11 +77,27 @@ export function computeDelay(time: string): PlayerDelayTime {
       cleanTimeList.map(time => Number(time))
     );
     const timeSeconds: number = timeToSeconds(formattedTime);
-    playerDelay.delayFormat =
-      (isNegative ? '-' : '') + prettifyTime(formattedTime).join(COLON_STRING);
-    playerDelay.delaySeconds = timeSeconds * (isNegative ? -1 : 1);
-    return playerDelay;
+    return timeSeconds * (isNegative ? -1 : 1);
   } catch {
-    return playerDelay;
+    return 0;
   }
+}
+
+export function formatDelay(seconds: number): string {
+  let sign = '';
+  if (seconds < 0) {
+    sign = '-';
+    seconds = -seconds;
+  }
+  const numbers = [
+    // Minutes
+    Math.floor((seconds / 60) % 60),
+    // Seconds
+    seconds % 60,
+  ];
+  // Hours are only shown if non-zero
+  if (seconds >= 3600) {
+    numbers.splice(0, 0, Math.floor(seconds / 3600));
+  }
+  return sign + numbers.map(s => ('' + s).padStart(2, '0')).join(':');
 }
