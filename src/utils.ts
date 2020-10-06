@@ -33,53 +33,22 @@ export function parseDuration(s: string): number {
   }
 }
 
-function timeToSeconds(time: number[]): number {
-  const seconds = time[0] * 3600 + time[1] * 60 + time[2];
-  return seconds;
-}
-
-function normalizeTime(time: number[]): number[] {
-  const extraSeconds = Math.floor(time[2] / 60);
-  time[2] -= 60 * extraSeconds;
-  time[1] += extraSeconds;
-  const extraMinutes = Math.floor(time[1] / 60);
-  time[1] -= 60 * extraMinutes;
-  time[0] += extraMinutes;
-
-  return time;
-}
-
 export function computeDelay(time: string): number {
-  if (!time.length) return 0;
-  const isNegative: boolean = time[0] === '-';
-  if (isNegative) time = time.substr(1);
-
-  try {
-    let cleanTimeList: string[] = new Array(3).fill('0');
-    const COLON_STRING = ':';
-    const MINUTE_STRING = 'm';
-
-    if (time.includes(COLON_STRING)) {
-      const timeStringList: string[] = time.split(COLON_STRING);
-
-      if (!(timeStringList.length === 2 || timeStringList.length === 3)) {
-        throw new Error('Invalid time');
-      }
-      const [hh, mm, ss = '0'] = timeStringList;
-      cleanTimeList = [hh, mm, ss];
-    } else if (time.includes(MINUTE_STRING)) {
-      cleanTimeList[1] = time.split(MINUTE_STRING)[0];
-    } else {
-      cleanTimeList[2] = time;
-    }
-
-    const formattedTime = normalizeTime(
-      cleanTimeList.map(time => Number(time))
-    );
-    const timeSeconds: number = timeToSeconds(formattedTime);
-    return timeSeconds * (isNegative ? -1 : 1);
-  } catch {
+  const m = time.match(/^(-?)(?:(?:([0-9]+):)?([0-9]+)(?:m|min|:))?([0-9]+)?$/);
+  //                     ^  ^^  ^            ^^      ^^          ^^^       ^
+  //                     |  ||  +------------+|      |+----------+|+-------+
+  //                     +--+|     optional   +------+  required  | optional
+  //                     sign|      hours     minutes   delimiter | seconds
+  //                         +------------------------------------+
+  //                                 optional hours+minutes
+  if (!m) {
     return 0;
+  } else {
+    const sign = m[1] === '-' ? -1 : 1;
+    const nums: number[] = m
+      .slice(2, 5)
+      .map(n => (n !== undefined ? Number(n) : 0));
+    return sign * (nums[0] * 3600 + nums[1] * 60 + nums[2]);
   }
 }
 
