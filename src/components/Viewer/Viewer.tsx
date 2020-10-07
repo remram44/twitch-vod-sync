@@ -1,6 +1,6 @@
 import React from 'react';
 import { VideoInfo, PlayerState } from '../../types';
-import { parseDuration } from '../../utils';
+import { parseDuration, computeDelay } from '../../utils';
 import { VideoPicker } from '../VideoPicker/VideoPicker';
 import './Viewer.css';
 
@@ -17,6 +17,7 @@ interface ViewerProps {
 
 interface ViewerState {
   delay: number;
+  delayFormat: string;
   video?: number;
   videoDate?: Date;
   videoDuration?: number;
@@ -41,6 +42,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   initialState() {
     return {
       delay: 0,
+      delayFormat: '0',
     };
   }
 
@@ -154,18 +156,22 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   handleDelayChange(evt: React.FormEvent) {
     evt.preventDefault();
     if (this.delayRef?.current) {
-      let delay = Number(this.delayRef.current.value);
-      if (isNaN(delay)) {
-        delay = 0;
-      }
-      this.setState({ delay });
-      this.delayRef.current.value = '' + delay;
+      const { delayFormat, delaySeconds } = computeDelay(
+        this.delayRef.current.value
+      );
+
+      this.setState({
+        delay: delaySeconds,
+        delayFormat,
+      });
+      this.delayRef.current.value = delayFormat;
     }
   }
 
   reset() {
     this.setState({
       delay: 0,
+      delayFormat: '0',
       video: undefined,
       videoDate: undefined,
       videoDuration: undefined,
@@ -190,7 +196,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
                 type="text"
                 name="delay"
                 ref={this.delayRef}
-                defaultValue={this.state.delay}
+                defaultValue={this.state.delayFormat}
               />{' '}
               <input type="submit" value="Set" />
             </form>
