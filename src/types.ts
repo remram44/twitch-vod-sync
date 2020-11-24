@@ -23,8 +23,3 @@ export type PlayerState =
   | PlayerStatePaused
   | PlayerStateBuffering
   | PlayerStatePlaying;
-
-export interface PlayerDelayTime {
-  delayFormat: string;
-  delaySeconds: number;
-}
