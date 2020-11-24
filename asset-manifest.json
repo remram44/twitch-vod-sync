@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/twitch-vod-sync/static/css/main.b67b6b5c.chunk.css",
-    "main.js": "/twitch-vod-sync/static/js/main.ef10fdaf.chunk.js",
-    "main.js.map": "/twitch-vod-sync/static/js/main.ef10fdaf.chunk.js.map",
+    "main.js": "/twitch-vod-sync/static/js/main.0956bb55.chunk.js",
+    "main.js.map": "/twitch-vod-sync/static/js/main.0956bb55.chunk.js.map",
     "runtime-main.js": "/twitch-vod-sync/static/js/runtime-main.cb77d154.js",
     "runtime-main.js.map": "/twitch-vod-sync/static/js/runtime-main.cb77d154.js.map",
     "static/js/2.b197b317.chunk.js": "/twitch-vod-sync/static/js/2.b197b317.chunk.js",
     "static/js/2.b197b317.chunk.js.map": "/twitch-vod-sync/static/js/2.b197b317.chunk.js.map",
     "index.html": "/twitch-vod-sync/index.html",
-    "precache-manifest.ecd00aa34ea5e0932e5339fc9bc3a0e5.js": "/twitch-vod-sync/precache-manifest.ecd00aa34ea5e0932e5339fc9bc3a0e5.js",
+    "precache-manifest.10c35f8584139caa419510e2cf9ac448.js": "/twitch-vod-sync/precache-manifest.10c35f8584139caa419510e2cf9ac448.js",
     "service-worker.js": "/twitch-vod-sync/service-worker.js",
     "static/css/main.b67b6b5c.chunk.css.map": "/twitch-vod-sync/static/css/main.b67b6b5c.chunk.css.map",
     "static/js/2.b197b317.chunk.js.LICENSE.txt": "/twitch-vod-sync/static/js/2.b197b317.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.cb77d154.js",
     "static/js/2.b197b317.chunk.js",
     "static/css/main.b67b6b5c.chunk.css",
-    "static/js/main.ef10fdaf.chunk.js"
+    "static/js/main.0956bb55.chunk.js"
   ]
 }
