@@ -9,8 +9,8 @@ This application can bring up multiple VOD (recorded streams), obtain their star
 
 **[Head over here to get started](https://remram44.github.io/twitch-vod-sync/)**
 
-Work in progress!
------------------
+Current status
+--------------
 
 This project is pretty much done! Suggestions and patches welcome.
 
