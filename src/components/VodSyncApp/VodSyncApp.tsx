@@ -33,6 +33,7 @@ export class VodSyncApp extends React.PureComponent<
     super(props);
     this.state = this.initialState();
     this.containerRef = React.createRef();
+    this.getTimelineBounds = this.getTimelineBounds.bind(this);
     this.setVideoInfo = this.setVideoInfo.bind(this);
     this.handlePlayerStateChange = this.handlePlayerStateChange.bind(this);
     this.handleSeek = this.handleSeek.bind(this);
@@ -111,6 +112,21 @@ export class VodSyncApp extends React.PureComponent<
         width: totalW / columns - 14,
       };
     });
+  }
+
+  getTimelineBounds() : [Date, Date] {
+    let timelineStart = new Date(8640000000000000);
+    let timelineEnd = new Date(-8640000000000000);
+
+    for (let videoInfo of Array.from(this.state.videos.values())) {
+      const videoStart = videoInfo.startDate;
+      const videoEnd = new Date(videoStart.getTime() + videoInfo.duration * 1000);
+
+      if (videoStart < timelineStart) { timelineStart = videoStart; }
+      if (videoEnd > timelineEnd) { timelineEnd = videoEnd; }
+    }
+
+    return [timelineStart, timelineEnd];
   }
 
   setVideoInfo(id: number, info: VideoInfo | undefined) {
@@ -258,11 +274,13 @@ export class VodSyncApp extends React.PureComponent<
 
   render() {
     if (!this.state.accessToken) {
+      // Before redirecting, capture the current URL so that we can return to where we came from
+      let redirectUri = encodeURIComponent(window.location.href);
       setTimeout(() => {
         window.location.href =
           'https://id.twitch.tv/oauth2/authorize?client_id=' +
           TWITCH_CLIENT_ID +
-          '&redirect_uri=https://remram44.github.io/twitch-vod-sync/&response_type=token&scope=';
+          '&redirect_uri=' + redirectUri + '&response_type=token&scope=';
       }, 2000);
       return <p>Redirecting you to Twitch to authorize use of their API...</p>;
     }
@@ -276,6 +294,7 @@ export class VodSyncApp extends React.PureComponent<
           clientId={TWITCH_CLIENT_ID}
           accessToken={this.state.accessToken}
           state={this.state.playerState}
+          getTimelineBounds={this.getTimelineBounds}
           setVideoInfo={this.setVideoInfo}
           setPlayerReady={() => this.handlePlayerReady(i)}
           onChange={this.handlePlayerStateChange}

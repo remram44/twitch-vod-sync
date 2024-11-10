@@ -9,6 +9,7 @@ interface ViewerProps {
   clientId: string;
   accessToken: string;
   state?: PlayerState;
+  getTimelineBounds: () => [ Date, Date ];
   setVideoInfo: (id: number, info: VideoInfo | undefined) => void;
   setPlayerReady: () => void;
   onChange: (id: number, playerState: PlayerState) => void;
@@ -33,6 +34,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     this.player = undefined;
     this.delayRef = React.createRef();
     this.handleVideoPicked = this.handleVideoPicked.bind(this);
+    this.handleChannelPicked = this.handleChannelPicked.bind(this);
     this.handleDelayChange = this.handleDelayChange.bind(this);
     this.reset = this.reset.bind(this);
     this.startedPlaying = this.startedPlaying.bind(this);
@@ -103,6 +105,64 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     }
   }
 
+  async handleChannelPicked(channel: string) {
+    this.setState({ video: 0 });
+
+    // Look up the channel's ID
+    let response = await fetch(
+      'https://api.twitch.tv/helix/users?login=' + channel,
+      {
+        headers: {
+          'Client-ID': this.props.clientId,
+          Authorization: 'Bearer ' + this.props.accessToken,
+        },
+      }
+    );
+    if (response.status !== 200) { return; }
+    let json = await response.json();
+    if (json.data.length === 0) { return; }
+
+    const channelId = json.data[0].id;
+    console.log('Got channel id: ', channelId);
+
+    // Then, look up videos from the channel
+    response = await fetch(
+      'https://api.twitch.tv/helix/videos?type=archive&sort=time&user_id=' + channelId,
+      {
+        headers: {
+          'Client-ID': this.props.clientId,
+          Authorization: 'Bearer ' + this.props.accessToken,
+        },
+      }
+    );
+    if (response.status !== 200) { return; }
+    json = await response.json();
+
+    console.log('Found ' + json.data.length + ' channel videos');
+
+    // Use a callback into the VodSyncApp to get the max/min values of all videos.
+    let [timelineStart, timelineEnd] = this.props.getTimelineBounds();
+
+    // Then, iterate all videos in the channel to find one within the appropriate time range.
+    // Hopefully there is only one, we will just pick the first.
+    for (let videoInfo of json.data) {
+      const videoStart = new Date(videoInfo.created_at);
+      const videoEnd = new Date(videoStart.getTime() + parseDuration(videoInfo.duration) * 1000);
+
+      // We are looking for two videos which have any overlap.
+      // Determine which started first -- our video or the timeline.
+      // Then, check to see if that video contains the timestamp of the other video's start.
+      if ((timelineStart <= videoStart && videoStart <= timelineEnd)
+        || (videoStart <= timelineStart && timelineStart <= videoEnd))
+      {
+        this.setState({ video: videoInfo.id });
+        console.log('Selected video which overlaps the current timeline: ', videoInfo.id);
+        this.createPlayer(videoInfo);
+        break;
+      }
+    }
+  }
+
   async handleVideoPicked(video: number) {
     this.setState({ video });
 
@@ -116,27 +176,33 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
         },
       }
     );
-    if (response.status === 200) {
-      const json = await response.json();
-      const videoInfo = json.data[0];
-      console.log('Got video date: ', videoInfo.created_at);
-      const videoDate = new Date(videoInfo.created_at);
-      const videoDuration = parseDuration(videoInfo.duration);
-      this.setState({
-        videoDate,
-        videoDuration,
-      });
-      this.props.setVideoInfo(this.props.id, {
-        startDate: videoDate,
-        duration: videoDuration,
-      });
-    }
+    if (response.status !== 200) { return; }
+
+    const json = await response.json();
+    if (json.data.length === 0) { return; }
+    const videoInfo = json.data[0];
+    console.log('Got video date: ', videoInfo.created_at);
+    this.createPlayer(videoInfo);
+  }
+
+  createPlayer(videoInfo: any) {
+    const videoDate = new Date(videoInfo.created_at);
+    const videoDuration = parseDuration(videoInfo.duration);
+
+    this.setState({
+      videoDate,
+      videoDuration,
+    });
+    this.props.setVideoInfo(this.props.id, {
+      startDate: videoDate,
+      duration: videoDuration,
+    });
 
     // Create player
     this.player = new Twitch.Player('player' + this.props.id, {
       width: '100%',
       height: '100%',
-      video,
+      video: videoInfo.id,
       autoplay: false,
     });
     this.player.addEventListener(Twitch.Player.PLAYING, this.startedPlaying);
@@ -206,7 +272,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
             width: this.props.width + 'px',
           }}
         >
-          <VideoPicker onVideoPicked={this.handleVideoPicked} />
+          <VideoPicker onVideoPicked={this.handleVideoPicked} onChannelPicked={this.handleChannelPicked} />
         </div>
       );
     }
