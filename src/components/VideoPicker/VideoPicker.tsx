@@ -35,7 +35,10 @@ export class VideoPicker extends React.PureComponent<VideoPickerProps> {
           console.log('Picked channel: ', value, ' ', channel);
           this.props.onChannelPicked(channel);
         } else {
-          console.log('Input URL did not match a video ID nor a channel: ', value);
+          console.log(
+            'Input URL did not match a video ID nor a channel: ',
+            value
+          );
         }
       }
     } else {

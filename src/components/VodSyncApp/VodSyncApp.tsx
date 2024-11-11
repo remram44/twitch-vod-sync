@@ -114,16 +114,18 @@ export class VodSyncApp extends React.PureComponent<
     });
   }
 
-  getTimelineBounds() : [Date, Date] {
+  getTimelineBounds(): [Date, Date] {
     let timelineStart = new Date(8640000000000000);
     let timelineEnd = new Date(-8640000000000000);
 
-    for (let videoInfo of Array.from(this.state.videos.values())) {
+    for (const videoInfo of Array.from(this.state.videos.values())) {
       const videoStart = videoInfo.startDate;
-      const videoEnd = new Date(videoStart.getTime() + videoInfo.duration * 1000);
+      const videoEnd = new Date(
+        videoStart.getTime() + videoInfo.duration * 1000
+      );
 
-      if (videoStart < timelineStart) { timelineStart = videoStart; }
-      if (videoEnd > timelineEnd) { timelineEnd = videoEnd; }
+      if (videoStart < timelineStart) timelineStart = videoStart;
+      if (videoEnd > timelineEnd) timelineEnd = videoEnd;
     }
 
     return [timelineStart, timelineEnd];
@@ -275,12 +277,14 @@ export class VodSyncApp extends React.PureComponent<
   render() {
     if (!this.state.accessToken) {
       // Before redirecting, capture the current URL so that we can return to where we came from
-      let redirectUri = encodeURIComponent(window.location.href);
+      const redirectUri = encodeURIComponent(window.location.href);
       setTimeout(() => {
         window.location.href =
           'https://id.twitch.tv/oauth2/authorize?client_id=' +
           TWITCH_CLIENT_ID +
-          '&redirect_uri=' + redirectUri + '&response_type=token&scope=';
+          '&redirect_uri=' +
+          redirectUri +
+          '&response_type=token&scope=';
       }, 2000);
       return <p>Redirecting you to Twitch to authorize use of their API...</p>;
     }
