@@ -18,20 +18,20 @@ export class VideoPicker extends React.PureComponent<VideoPickerProps> {
     evt.preventDefault();
     if (this.inputRef.current) {
       const value = this.inputRef.current.value;
-      const video_id_match = value.match(
+      const videoIdMatch = value.match(
         /^(?:https?:\/\/(?:www\.|m\.)?twitch\.tv\/videos\/)?([0-9]+)(?:\?.*)?$/
       );
-      if (video_id_match) {
-        const video = Number(video_id_match[1]);
+      if (videoIdMatch) {
+        const video = Number(videoIdMatch[1]);
         console.log('Picked video: ', value, ' ', video);
         this.props.onVideoPicked(video);
       } else {
-        const channel_match = value.match(
+        const channelMatch = value.match(
           /^(?:https?:\/\/(?:www\.|m\.)?twitch\.tv\/)?([a-zA-Z0-9]\w+)\/?(?:\?.*)?$/
         );
 
-        if (channel_match) {
-          const channel = String(channel_match[1]);
+        if (channelMatch) {
+          const channel = String(channelMatch[1]);
           console.log('Picked channel: ', value, ' ', channel);
           this.props.onChannelPicked(channel);
         } else {
