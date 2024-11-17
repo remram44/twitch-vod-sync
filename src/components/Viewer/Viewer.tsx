@@ -192,7 +192,7 @@ export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
     this.createPlayer(videoInfo);
   }
 
-  createPlayer(videoInfo: {created_at: Date, duration: string, id: string}) {
+  createPlayer(videoInfo: {created_at: Date, duration: string, id: number}) {
     const videoDate = new Date(videoInfo.created_at);
     const videoDuration = parseDuration(videoInfo.duration);
 
