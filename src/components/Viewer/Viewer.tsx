@@ -24,7 +24,7 @@ interface ViewerState {
 
 export class Viewer extends React.PureComponent<ViewerProps, ViewerState> {
   player?: Twitch.Player;
-  delayRef?: React.RefObject<HTMLInputElement>;
+  delayRef?: React.RefObject<HTMLInputElement | null>;
   startTimer?: number;
 
   constructor(props: ViewerProps) {

@@ -27,7 +27,7 @@ export class VodSyncApp extends React.PureComponent<
   VodSyncAppState
 > {
   interval?: number;
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 
   constructor(props: VodSyncAppProps) {
     super(props);
