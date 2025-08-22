@@ -20,8 +20,8 @@ jobs:
         restore-keys: |
           node-
     - run: npm install
-    - run: PUBLIC_URL=/twitch-vod-sync/ npm run build
     - run: npm run check
+    - run: PUBLIC_URL=/twitch-vod-sync/ npm run build
     - run: npm run test
     - run: echo ${{ github.ref }}
     - uses: peaceiris/actions-gh-pages@v3
