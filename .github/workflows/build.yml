@@ -8,11 +8,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v4
       with:
         node-version: 18.x
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4
       id: node-modules
       with:
         path: node_modules
@@ -24,7 +24,7 @@ jobs:
     - run: PUBLIC_URL=/twitch-vod-sync/ npm run build
     - run: npm run test
     - run: echo ${{ github.ref }}
-    - uses: peaceiris/actions-gh-pages@v3
+    - uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./build
