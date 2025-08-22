@@ -5,7 +5,7 @@ interface VideoPickerProps {
 }
 
 export class VideoPicker extends React.PureComponent<VideoPickerProps> {
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
 
   constructor(props: VideoPickerProps) {
     super(props);

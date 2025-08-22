@@ -46,7 +46,7 @@ export function Timeline(props: TimelineProps) {
   const s = startDate.getTime(),
     e = endDate.getTime();
 
-  const tsRef: React.RefObject<HTMLDivElement> = React.createRef();
+  const tsRef: React.RefObject<HTMLDivElement | null> = React.createRef();
 
   function handleClick(evt: React.MouseEvent) {
     if (!tsRef.current) {

@@ -1,11 +1,11 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { App } from './App';
 import { computeDelay, formatDelay } from './utils';
 
 test('renders redirect to Twitch auth', () => {
-  const { getByText } = render(<App />);
-  const linkElement = getByText(/Redirecting you to Twitch to authorize/i);
+  render(<App />);
+  const linkElement = screen.getByText(/Redirecting you to Twitch to authorize/i);
   expect(linkElement).toBeInTheDocument();
 });
 
