@@ -28,3 +28,37 @@ FAQ
 ### Why do I need to give access to my Twitch account?
 
 Unfortunately I can only get the creation date for a video from the API, not the embed system, and the API needs authorization. Note that I am requesting no permissions on your account, I just query the video API on your behalf. This is also a static web app so I am not collecting the access token (it stays in your browser).
+
+
+# Selfhost
+
+---
+
+
+🖥️ Self-hosting with Node/Express (optional)
+
+You can run this project as a standalone server using Node.js.
+
+---
+1. Clone the repo:
+```
+git clone https://github.com/remram44/twitch-vod-sync.git
+```
+Install dependencies
+```
+npm install
+```
+
+2. Build the app:
+```
+npm run build
+```
+3. Start the server:
+```
+npm run serve
+```
+4. Open:
+```
+http://localhost:3000
+```
+---
